@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="PayrollBudgetCalculator.cpp" />
     <ClCompile Include="Staff.cpp" />
+    <ClCompile Include="StaffManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Staff.h" />

@@ -21,6 +21,9 @@
     <ClCompile Include="Staff.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="StaffManager.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StaffManager.h">
