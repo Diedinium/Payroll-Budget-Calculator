@@ -3,6 +3,8 @@
 #include <vector>
 #include "Staff.h"
 #include "StaffManager.h"
+#include "InputValidator.h"
+#include "Menu.h"
 
 int main()
 {
@@ -34,5 +36,13 @@ int main()
         "\nWage: " << cont->GetWage() <<
         "\nContract Cost? " << cont->GetContractCost()
         << "\n";
+
+    std::cout << "\nInput an int: ";
+    int testInput = InputValidator::ValidateInt();
+    std::cout << "\nYou input " << testInput << "\n";
+
+    std::cout << "\nInput an double: ";
+    double testInput1 = InputValidator::ValidateDouble();
+    std::cout << "\nYou input " << testInput1 << "\n";
 }
 

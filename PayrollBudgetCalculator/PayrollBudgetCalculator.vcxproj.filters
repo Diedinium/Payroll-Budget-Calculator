@@ -24,12 +24,24 @@
     <ClCompile Include="StaffManager.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="InputValidator.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StaffManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Staff.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InputValidator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
