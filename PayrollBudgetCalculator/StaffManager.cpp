@@ -29,7 +29,7 @@ SalariedStaff* StaffManager::GetSalariedStaff(std::string strFullname) {
 		return &*position;
 	}
 	else {
-		throw std::exception("Salaried staff member not found.");
+		return NULL;
 	}
 }
 
@@ -40,6 +40,6 @@ ContractStaff* StaffManager::GetContractStaff(std::string strFullname) {
 		return &*position;
 	}
 	else {
-		throw std::exception("Contract staff member not found.");
+		return NULL;
 	}
 }

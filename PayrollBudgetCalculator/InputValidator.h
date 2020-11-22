@@ -12,5 +12,6 @@ private:
 public:
 	static int ValidateInt();
 	static double ValidateDouble();
+	static std::string ValidateString();
 };
 #endif

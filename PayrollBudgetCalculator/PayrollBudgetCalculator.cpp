@@ -15,34 +15,15 @@ int main()
     staffManager.AddSalariedStaff(SalariedStaff("Luke", "Boyle", "Junior Developer", "IT", 20252, false));
     staffManager.AddSalariedStaff(SalariedStaff("Jake", "Hall", "Senior Developer", "IT", 35050, true));
 
-    ContractStaff* cont = staffManager.GetContractStaff("Tobi Biddle");
-    SalariedStaff* sal = staffManager.GetSalariedStaff("Luke Boyle");
-    SalariedStaff* sal1 = staffManager.GetSalariedStaff("Jake Hall");
+    MenuContainer menuContainer = MenuContainer("Welcome to the payroll project budget calculator.\nPlease choose your option below.\n");
+    menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Exit application", &menuContainer)));
+    menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuStaffManagement("Manage Staff", &staffManager)));
+    menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuCalculateBudget("Calculate Budget or view reports", &staffManager)));
+    menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuSaveLoad("Save or load data", &staffManager)));
 
-    std::cout << "Name: " << sal->GetFullName() <<
-        "\nRole: " << sal->GetDepartment() << ", " << sal->GetJobRole() <<
-        "\nSalary: " << sal->GetSalary() <<
-        "\nSenior? " << (sal->GetSenior() == true ? "Yes" : "No")
-        << "\n\n";
-
-    std::cout << "Name: " << sal1->GetFullName() <<
-        "\nRole: " << sal1->GetDepartment() << ", " << sal1->GetJobRole() <<
-        "\nSalary: " << sal1->GetSalary() <<
-        "\nSenior? " << (sal1->GetSenior() == true ? "Yes" : "No")
-        << "\n\n";
-
-    std::cout << "Name: " << cont->GetFullName() <<
-        "\nRole: " << cont->GetDepartment() << ", " << cont->GetJobRole() <<
-        "\nWage: " << cont->GetWage() <<
-        "\nContract Cost? " << cont->GetContractCost()
-        << "\n";
-
-    std::cout << "\nInput an int: ";
-    int testInput = InputValidator::ValidateInt();
-    std::cout << "\nYou input " << testInput << "\n";
-
-    std::cout << "\nInput an double: ";
-    double testInput1 = InputValidator::ValidateDouble();
-    std::cout << "\nYou input " << testInput1 << "\n";
+    while (!menuContainer.GetExitMenu()) {
+        system("cls");
+        menuContainer.Execute();
+    }  
 }
 

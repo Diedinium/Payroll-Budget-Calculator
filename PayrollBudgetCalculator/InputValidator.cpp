@@ -10,7 +10,7 @@ int InputValidator::ValidateInt() {
 			iInput = std::stoi(strInput);
 			return iInput;
 		}
-		catch (std::exception& ex) {
+		catch (std::exception) {
 			std::cout << "Not a valid whole number, try again: ";
 		}
 	}
@@ -26,8 +26,14 @@ double InputValidator::ValidateDouble() {
 			dInput = std::stod(strInput);
 			return dInput;
 		}
-		catch (std::exception& ex) {
+		catch (std::exception) {
 			std::cout << "Not a valid number, try again: ";
 		}
 	}
+}
+
+std::string InputValidator::ValidateString() {
+	std::string strInput;
+	std::getline(std::cin, strInput);
+	return strInput;
 }
