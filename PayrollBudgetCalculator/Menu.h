@@ -39,7 +39,7 @@ public:
 
 class MenuStaffManagement : public GeneralMenuItem {
 public:
-    MenuStaffManagement(std::string output, StaffManager* staffManager);
+    MenuStaffManagement(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 
@@ -60,6 +60,42 @@ public:
 class MenuSaveLoad : public GeneralMenuItem {
 public:
     MenuSaveLoad(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    void Execute();
+};
+
+class SubMenuAddStaffMember : public GeneralMenuItem {
+public:
+    SubMenuAddStaffMember(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    void Execute();
+};
+
+class SubMenuAddSalariedStaff : public GeneralMenuItem {
+public:
+    SubMenuAddSalariedStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    void Execute();
+};
+
+class SubMenuAddContractStaff : public GeneralMenuItem {
+public:
+    SubMenuAddContractStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    void Execute();
+};
+
+class SubMenuRemoveStaffMember : public GeneralMenuItem {
+public:
+    SubMenuRemoveStaffMember(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    void Execute();
+};
+
+class SubMenuRemoveSalariedStaffMember : public GeneralMenuItem {
+public:
+    SubMenuRemoveSalariedStaffMember(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    void Execute();
+};
+
+class SubMenuRemoveContractStaff : public GeneralMenuItem {
+public:
+    SubMenuRemoveContractStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 #endif // !MENU_H
