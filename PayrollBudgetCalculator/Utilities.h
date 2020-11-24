@@ -2,10 +2,11 @@
 
 #include <algorithm>
 #include <conio.h>
+#include <iostream>
 
 #ifndef H_TEMPLATES
 #define H_TEMPLATES
-namespace tmplt {
+namespace util {
     template <typename IteratorT, typename FunctionT>
     FunctionT for_each_iterator(IteratorT first, IteratorT last, typename std::iterator_traits<IteratorT>::difference_type initial, FunctionT func) {
         for (; first != last; ++first, ++initial)

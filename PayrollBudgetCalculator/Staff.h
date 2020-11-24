@@ -53,6 +53,7 @@ public:
 
 	void SetWeeks(int iWeeks) { _iWeeks = iWeeks; }
 	int GetWeeks() { return _iWeeks; }
+	std::string GetWeeksFormatted() { return std::to_string(_iWeeks) + " weeks"; }
 	
 	double GetContractCost();
 };

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <iomanip>
 #include "StaffManager.h"
 #include "InputValidator.h"
 
@@ -60,6 +61,12 @@ public:
 class MenuSaveLoad : public GeneralMenuItem {
 public:
     MenuSaveLoad(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    void Execute();
+};
+
+class MenuViewStaff : public GeneralMenuItem {
+public:
+    MenuViewStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 

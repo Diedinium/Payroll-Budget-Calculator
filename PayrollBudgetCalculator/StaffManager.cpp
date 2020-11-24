@@ -43,3 +43,19 @@ ContractStaff* StaffManager::GetContractStaff(std::string strFullname) {
 		return NULL;
 	}
 }
+
+size_t StaffManager::CountSeniorStaff() {
+	size_t count = 0;
+	std::for_each(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&count](SalariedStaff& item) {
+		if (item.GetSenior()) count++;
+	});
+	return count;
+}
+
+size_t StaffManager::CountStandardStaff() {
+	size_t count = 0;
+	std::for_each(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&count](SalariedStaff& item) {
+		if (!item.GetSenior()) count++;
+	});
+	return count;
+}
