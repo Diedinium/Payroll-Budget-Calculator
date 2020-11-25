@@ -30,6 +30,9 @@
     <ClCompile Include="Menu.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StaffManager.h">

@@ -7,7 +7,7 @@
 void MenuContainer::Execute()
 {
 	std::cout << _strText << "\n";
-	util::for_each_iterator(_vecMenuItems.begin(), _vecMenuItems.end(), 0, [](unsigned index, std::unique_ptr<MenuItem> const& item) {
+	util::for_each_iterator(_vecMenuItems.begin(), _vecMenuItems.end(), 0, [](int index, std::unique_ptr<MenuItem> const& item) {
 		std::cout << "\t" << index << " - " << item->ItemText() << "\n";
 		});
 	std::cout << "\nChoice: ";
@@ -41,34 +41,6 @@ void MenuStaffManagement::Execute() {
 		system("cls");
 		objMenuContainer.Execute();
 	}
-
-	/*std::string strNameInput = InputValidator::ValidateString();
-	ContractStaff* cont = _ptrStaffManager->GetContractStaff(strNameInput);
-	SalariedStaff* sal = _ptrStaffManager->GetSalariedStaff(strNameInput);
-
-	if (cont == NULL && sal == NULL) {
-		std::cout << "No staff with these details found in contracted or salaried staff";
-		return;
-	}
-
-	if (cont != NULL) {
-		std::cout << "Contract staff member found: \n";
-		std::cout << "Name: " << cont->GetFullName() <<
-			"\nRole: " << cont->GetDepartment() << ", " << cont->GetJobRole() <<
-			"\nWage: " << cont->GetWage() <<
-			"\nContract Cost? " << cont->GetContractCost()
-			<< "\n";
-	}
-
-	if (sal != NULL) {
-		std::cout << "Salaried staff member found: \n";
-		std::cout << "Name: " << sal->GetFullName() <<
-			"\nRole: " << sal->GetDepartment() << ", " << sal->GetJobRole() <<
-			"\nSalary: " << sal->GetSalary() <<
-			"\nSenior? " << (sal->GetSenior() == true ? "Yes" : "No")
-			<< "\n\n";
-	}
-	util::Pause();*/
 };
 
 MenuExit::MenuExit(std::string output, MenuContainer* menuContainer) : GeneralMenuItem(output, NULL) {
@@ -115,23 +87,11 @@ void MenuViewStaff::Execute() {
 		if (ptrVecSalariedStaff->size() > 0) {
 			std::cout << "Salaried Staff\n";
 			std::cout << "Count: " << ptrVecSalariedStaff->size() << "\n";
-			std::cout << "-------------------------------------------------------------------------------------------------------------\n";
-			std::cout << std::setw(4) << std::left << "Num" << std::setw(15) << std::left << "First Name" << std::setw(15) << std::left << "Last Name" << std::setw(25) << "Job Role" << std::setw(15) << "Department" << std::setw(12) << "Salary" << std::setw(5) << "Senior?" << "\n";
-			std::cout << "-------------------------------------------------------------------------------------------------------------\n";
-			util::for_each_iterator(ptrVecSalariedStaff->begin(), ptrVecSalariedStaff->end(), 0, [](int index, SalariedStaff& item) {
-				std::cout.precision(2);
-				std::cout
-					<< std::fixed << std::setw(4) << std::left << index
-					<< std::fixed << std::setw(15) << std::left << item.GetFirstName()
-					<< std::fixed << std::setw(15) << std::left << item.GetLastName()
-					<< std::fixed << std::setw(25) << std::left << item.GetJobRole()
-					<< std::fixed << std::setw(15) << std::left << item.GetDepartment()
-					<< std::fixed << std::setw(12) << std::left << item.GetSalary()
-					<< std::fixed << std::setw(10) << std::left << (item.GetSenior() == true ? "Yes" : "No") << "\n";
-			});
+			util::OutputSalariedStaffHeader();
+			util::OutputSalariedStaff(ptrVecSalariedStaff);
 			std::cout << "\n";
 
-			if (_ptrStaffManager->CountSeniorStaff() < 3) std::cout << "Warning: You currently have than 3 senior staff members. A normal project should contain at least 3 senior staff.\n";
+			if (_ptrStaffManager->CountSeniorStaff() < 3) std::cout << "Warning: You currently have less than 3 senior staff members. A normal project should contain at least 3 senior staff.\n";
 			if (_ptrStaffManager->CountStandardStaff() < 5) std::cout << "Warning: You currently have less than 5 salaried staff members. A normal project should contain at least 5 salaried staff.\n";
 
 			std::cout << "\n";
@@ -143,24 +103,11 @@ void MenuViewStaff::Execute() {
 		if (ptrVecContractStaff->size() > 0) {
 			std::cout << "Contract Staff\n";
 			std::cout << "Count: " << ptrVecContractStaff->size() << "\n";
-			std::cout << "----------------------------------------------------------------------------------------------------------\n";
-			std::cout << std::setw(4) << std::left << "Num" << std::setw(15) << std::left << "First Name" << std::setw(15) << std::left << "Last Name" << std::setw(25) << std::left << "Job Role" << std::setw(15) << std::left << "Department" << std::setw(8) << std::left << "Wage" << std::setw(12) << std::left << "Hours p/w" << std::setw(10) << std::left << "Contracted" << "\n";
-			std::cout << "----------------------------------------------------------------------------------------------------------\n";
-			util::for_each_iterator(ptrVecContractStaff->begin(), ptrVecContractStaff->end(), 0, [](int index, ContractStaff& item) {
-				std::cout.precision(2);
-				std::cout
-					<< std::fixed << std::setw(4) << std::left << index
-					<< std::fixed << std::setw(15) << std::left << item.GetFirstName()
-					<< std::fixed << std::setw(15) << std::left << item.GetLastName()
-					<< std::fixed << std::setw(25) << std::left << item.GetJobRole()
-					<< std::fixed << std::setw(15) << std::left << item.GetDepartment()
-					<< std::fixed << std::setw(8) << std::left << item.GetWage()
-					<< std::fixed << std::setw(12) << std::left << item.GetWeeklyHours()
-					<< std::fixed << std::setw(10) << std::left << item.GetWeeksFormatted() << "\n";
-				});
+			util::OutputContractStaffHeader();
+			util::OutputContractStaff(ptrVecContractStaff);
 			std::cout << "\n";
 
-			if (ptrVecContractStaff->size() < 5) std::cout << "Warning: You currently have than 5 contracted staff. A normal project should contain at least 5 contracted staff.\n";
+			if (ptrVecContractStaff->size() < 5) std::cout << "Warning: You currently have less than 5 contracted staff. A normal project should contain at least 5 contracted staff.\n";
 		}
 		else {
 			std::cout << "There are not currently any contract staff to list.\nPlease note a 'normal' project usually has 5 contract staff.\n";
@@ -184,14 +131,76 @@ void SubMenuAddStaffMember::Execute() {
 
 void SubMenuAddSalariedStaff::Execute() {
 	system("cls");
-	std::cout << "Add Salaried Staff menu\nThis is a placeholder menu option...\n";
-	util::Pause();
+	std::cout << "Add Salaried Staff\n";
+
+	std::string strFirstName, strLastName, strJobRole, strDepartment;
+	int iSeniorStatus;
+	SalariedStaff objSalariedStaff;
+	
+	std::cout << "First Name: ";
+	strFirstName = InputValidator::ValidateString(15);
+	std::cout << "Last Name: ";
+	strLastName = InputValidator::ValidateString(15);
+	std::cout << "Job Role: ";
+	strJobRole = InputValidator::ValidateString(25);
+	std::cout << "Department: ";
+	strDepartment = InputValidator::ValidateString(20);
+
+	objSalariedStaff.UpdateDetails(strFirstName, strLastName, strJobRole, strDepartment);
+
+	std::cout << "Salary: ";
+	objSalariedStaff.SetSalary(InputValidator::ValidateDouble());
+	std::cout << "Senior (1 for senior, or 0 otherwise): ";
+	iSeniorStatus = InputValidator::ValidateInt();
+
+	if (iSeniorStatus == 1) {
+		objSalariedStaff.SetSenior(true);
+	}
+
+	try {
+		_ptrStaffManager->AddSalariedStaff(objSalariedStaff);
+		std::cout << "\nStaff member " << objSalariedStaff.GetFullName() << " added.\n\n";
+		util::Pause();
+	}
+	catch (std::exception& ex) {
+		std::cout << ex.what() << "\n\n";
+	}
 };
 
 void SubMenuAddContractStaff::Execute() {
 	system("cls");
-	std::cout << "Add Contract Staf menu\nThis is a placeholder menu option...\n";
-	util::Pause();
+	std::cout << "Add Salaried Staff\n";
+
+	std::string strFirstName, strLastName, strJobRole, strDepartment;
+	ContractStaff objContractStaff;
+
+	std::cout << "First Name: ";
+	strFirstName = InputValidator::ValidateString(15);
+	std::cout << "Last Name: ";
+	strLastName = InputValidator::ValidateString(15);
+	std::cout << "Job Role: ";
+	strJobRole = InputValidator::ValidateString(25);
+	std::cout << "Department: ";
+	strDepartment = InputValidator::ValidateString(20);
+
+	objContractStaff.UpdateDetails(strFirstName, strLastName, strJobRole, strDepartment);
+
+	std::cout << "Wage (per hour): ";
+	objContractStaff.SetWage(InputValidator::ValidateDouble());
+	std::cout << "Weekly hours (max 20h): ";
+	objContractStaff.SetWeeklyHours(InputValidator::ValidateDouble(20));
+	std::cout << "Contracted Weeks (max 30 weeks): ";
+	objContractStaff.SetWeeks(InputValidator::ValidateInt(30));
+
+	try {
+		_ptrStaffManager->AddContractStaff(objContractStaff);
+		std::cout << "\nContract staff member " << objContractStaff.GetFullName() << " added.\n\n";
+		util::Pause();
+	}
+	catch (std::exception& ex) {
+		std::cout << ex.what() << "\n\n";
+		util::Pause();
+	}
 };
 
 void SubMenuRemoveStaffMember::Execute() {
@@ -208,13 +217,77 @@ void SubMenuRemoveStaffMember::Execute() {
 };
 
 void SubMenuRemoveSalariedStaffMember::Execute() {
-	system("cls");
-	std::cout << "Remove Salaried staff menu\nThis is a placeholder menu option...\n";
-	util::Pause();
+	bool boolExitWhile = false;
+	do {
+		system("cls");
+		std::cout << "Remove Salaried staff menu\n\n";
+
+		std::vector<SalariedStaff>* ptrVecSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
+
+		if (ptrVecSalariedStaff->size() < 1) {
+			std::cout << "No salaried staff found.\n";
+			boolExitWhile = true;
+			util::Pause();
+		} 
+		else {
+			util::OutputSalariedStaffHeader();
+			util::OutputSalariedStaff(ptrVecSalariedStaff);
+			std::cout << "\n";
+
+			std::cout << "Note: Enter 0 to exit.\n";
+			std::cout << "Full name of salaried staff to remove: ";
+			std::string strFullName = InputValidator::ValidateString();
+
+			if (strFullName == "0") {
+				boolExitWhile = true;
+			}
+			else {
+				try {
+					_ptrStaffManager->RemoveSalariedStaff(strFullName);
+				}
+				catch (std::exception& ex) {
+					std::cout << ex.what() << "\n";
+					util::Pause();
+				}
+			}
+		}
+	} while (!boolExitWhile);
 };
 
 void SubMenuRemoveContractStaff::Execute() {
-	system("cls");
-	std::cout << "Remove Contract staff menu\nThis is a placeholder menu option...\n";
-	util::Pause();
+	bool boolExitWhile = false;
+	do {
+		system("cls");
+		std::cout << "Remove contract staff menu\n\n";
+
+		std::vector<ContractStaff>* ptrVecContractStaff = _ptrStaffManager->GetPtrContractStaff();
+
+		if (ptrVecContractStaff->size() < 1) {
+			std::cout << "No contract staff found.\n";
+			boolExitWhile = true;
+			util::Pause();
+		}
+		else {
+			util::OutputContractStaffHeader();
+			util::OutputContractStaff(ptrVecContractStaff);
+			std::cout << "\n";
+
+			std::cout << "Note: Enter 0 to exit.\n";
+			std::cout << "Full name of contract staff to remove: ";
+			std::string strFullName = InputValidator::ValidateString();
+
+			if (strFullName == "0") {
+				boolExitWhile = true;
+			}
+			else {
+				try {
+					_ptrStaffManager->RemoveContractStaff(strFullName);
+				}
+				catch (std::exception& ex) {
+					std::cout << ex.what() << "\n";
+					util::Pause();
+				}
+			}
+		}
+	} while (!boolExitWhile);
 };

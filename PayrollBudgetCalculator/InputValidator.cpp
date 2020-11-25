@@ -11,7 +11,29 @@ int InputValidator::ValidateInt() {
 			return iInput;
 		}
 		catch (std::exception) {
-			std::cout << "Not a valid whole number, try again: ";
+			std::cout << "Not a valid whole number: ";
+		}
+	}
+}
+
+int InputValidator::ValidateInt(int maxSize) {
+	std::string strInput;
+	int iInput;
+
+	while (true) {
+		std::getline(std::cin, strInput);
+		try {
+			iInput = std::stoi(strInput);
+
+			if (iInput > maxSize) {
+				std::cout << "To large, max size is " << std::setprecision(2) << maxSize << ": ";
+			}
+			else {
+				return iInput;
+			}
+		}
+		catch (std::exception) {
+			std::cout << "Not a valid whole number: ";
 		}
 	}
 }
@@ -27,7 +49,29 @@ double InputValidator::ValidateDouble() {
 			return dInput;
 		}
 		catch (std::exception) {
-			std::cout << "Not a valid number, try again: ";
+			std::cout << "Not a valid number: ";
+		}
+	}
+}
+
+double InputValidator::ValidateDouble(double maxSize) {
+	std::string strInput;
+	double dInput;
+
+	while (true) {
+		std::getline(std::cin, strInput);
+		try {
+			dInput = std::stod(strInput);
+
+			if (dInput > maxSize) {
+				std::cout << "To large, max size is " << std::setprecision(2) << maxSize << ": ";
+			}
+			else {
+				return dInput;
+			}
+		}
+		catch (std::exception) {
+			std::cout << "Not a valid number: ";
 		}
 	}
 }
@@ -36,4 +80,21 @@ std::string InputValidator::ValidateString() {
 	std::string strInput;
 	std::getline(std::cin, strInput);
 	return strInput;
+}
+
+std::string InputValidator::ValidateString(int maxLength) {
+	std::string strInput;
+
+	while (true) {
+		std::string strMessage = "Not a valid number";
+		std::getline(std::cin, strInput);
+
+		if (strInput.length() > (size_t)maxLength) {
+			strMessage = "To long, max length is " + std::to_string(maxLength);
+			std::cout << strMessage << ", try again: ";
+		}
+		else {
+			return strInput;
+		}
+	}
 }

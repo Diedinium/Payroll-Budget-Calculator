@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <iomanip>
 
 #ifndef INPUTVALIDATOR_H
 #define INPUTVALIDATOR_H
@@ -11,7 +12,10 @@ private:
 	InputValidator();
 public:
 	static int ValidateInt();
+	static int ValidateInt(int maxSize);
 	static double ValidateDouble();
+	static double ValidateDouble(double maxSize);
 	static std::string ValidateString();
+	static std::string ValidateString(int maxLength);
 };
 #endif

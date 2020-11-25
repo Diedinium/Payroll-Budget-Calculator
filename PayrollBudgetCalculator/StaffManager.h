@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iostream>
+#include <sstream>
 #include "Staff.h"
 
 #ifndef STAFFMANAGER_H
@@ -14,6 +16,9 @@ class StaffManager {
 public:
 	void AddSalariedStaff(SalariedStaff objSalariedStaff);
 	void AddContractStaff(ContractStaff objContractStaff);
+
+	void RemoveSalariedStaff(std::string strFullName);
+	void RemoveContractStaff(std::string strFullName);
 
 	SalariedStaff* GetSalariedStaff(std::string strFullName);
 	ContractStaff* GetContractStaff(std::string strFullName);
