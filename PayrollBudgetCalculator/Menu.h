@@ -105,4 +105,30 @@ public:
     SubMenuRemoveContractStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
+
+class MenuUpdateStaff : public GeneralMenuItem {
+public:
+    MenuUpdateStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    void Execute();
+};
+
+class SubMenuUpdateSalariedStaff : public GeneralMenuItem {
+public:
+    SubMenuUpdateSalariedStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    void Execute();
+};
+
+class SubMenuUpdateContractStaff : public GeneralMenuItem {
+public:
+    SubMenuUpdateContractStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    void Execute();
+};
+
+class ActionMenuUpdateSalariedFirstName : public GeneralMenuItem {
+private:
+    SalariedStaff* _ptrSalariedStaff;
+public:
+    ActionMenuUpdateSalariedFirstName(std::string output, SalariedStaff* salariedStaff) : GeneralMenuItem(output, NULL) { _ptrSalariedStaff = salariedStaff; }
+    void Execute();
+};
 #endif // !MENU_H

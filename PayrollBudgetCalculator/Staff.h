@@ -14,10 +14,18 @@ public:
 	Staff();
 	Staff(std::string strFirstName, std::string strLastName, std::string strJobRole, std::string strDepartment);
 	std::string GetFullName() { return _strFirstName + " " + _strLastName; }
+
 	std::string GetFirstName() { return _strFirstName; }
+	void SetFirstName(std::string strFirstName) { _strFirstName = strFirstName; }
+
 	std::string GetLastName() { return _strLastName; }
+	void SetLastName(std::string strLastName) { _strLastName = strLastName; }
+
 	std::string GetJobRole() { return _strJobRole; }
+	void SetJobRole(std::string strJobRole) { _strJobRole = strJobRole; }
+
 	std::string GetDepartment() { return _strDepartment; }
+	void SetDepartment(std::string strDepartment) { _strDepartment = strDepartment; }
 
 	void UpdateDetails(std::string strFirstName, std::string strLastName, std::string strJobRole, std::string strDepartment);
 	void UpdateDetails(std::string strJobRole, std::string strDepartment);
@@ -30,11 +38,11 @@ public:
 	SalariedStaff();
 	SalariedStaff(std::string strFirstName, std::string strLastName, std::string strJobRole, std::string strDepartment, double dSalary, bool boolIsSenior);
 
-	void SetSalary(double dSalary) { _dSalary = dSalary; }
 	double GetSalary() { return _dSalary; }
+	void SetSalary(double dSalary) { _dSalary = dSalary; }
 
-	void SetSenior(bool boolIsSenior) { _boolIsSenior = boolIsSenior; }
 	bool GetSenior() { return _boolIsSenior; }
+	void SetSenior(bool boolIsSenior) { _boolIsSenior = boolIsSenior; }
 };
 
 class ContractStaff : public Staff {
@@ -45,14 +53,15 @@ public:
 	ContractStaff();
 	ContractStaff(std::string strFirstName, std::string strLastName, std::string strJobRole, std::string strDepartment, double dWage, double dWeeklyHours, int iWeeks);
 
-	void SetWage(double dWage) { _dWage = dWage; }
 	double GetWage() { return _dWage; }
-
-	void SetWeeklyHours(double dWeeklyHours) { _dWeeklyHours = dWeeklyHours; }
+	void SetWage(double dWage) { _dWage = dWage; }
+	
 	double GetWeeklyHours() { return _dWeeklyHours; }
+	void SetWeeklyHours(double dWeeklyHours) { _dWeeklyHours = dWeeklyHours; }
 
-	void SetWeeks(int iWeeks) { _iWeeks = iWeeks; }
 	int GetWeeks() { return _iWeeks; }
+	void SetWeeks(int iWeeks) { _iWeeks = iWeeks; }
+
 	std::string GetWeeksFormatted() { return std::to_string(_iWeeks) + " weeks"; }
 	
 	double GetContractCost();
