@@ -144,13 +144,14 @@
     <ClCompile Include="PayrollBudgetCalculator.cpp" />
     <ClCompile Include="Staff.cpp" />
     <ClCompile Include="StaffManager.cpp" />
+    <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputValidator.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Staff.h" />
     <ClInclude Include="StaffManager.h" />
-    <ClInclude Include="Templates.h" />
+    <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -22,6 +22,28 @@ void StaffManager::AddContractStaff(ContractStaff objContractStaff) {
 	}
 }
 
+void StaffManager::RemoveSalariedStaff(std::string strFullName) {
+	auto position = std::find_if(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&strFullName](SalariedStaff& obj) { return obj.GetFullName() == strFullName; });
+
+	if (position != _vecSalariedStaff.end()) {
+		_vecSalariedStaff.erase(position);
+	}
+	else {
+		throw std::invalid_argument("Cannot remove " + strFullName + ", staff member not found");
+	}
+}
+
+void StaffManager::RemoveContractStaff(std::string strFullName) {
+	auto position = std::find_if(_vecContractStaff.begin(), _vecContractStaff.end(), [&strFullName](ContractStaff& obj) { return obj.GetFullName() == strFullName; });
+
+	if (position != _vecContractStaff.end()) {
+		_vecContractStaff.erase(position);
+	}
+	else {
+		throw std::invalid_argument("Cannot remove " + strFullName + ", staff member not found");
+	}
+}
+
 SalariedStaff* StaffManager::GetSalariedStaff(std::string strFullname) {
 	auto position = std::find_if(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&strFullname](SalariedStaff& obj) { return obj.GetFullName() == strFullname; });
 
@@ -42,4 +64,20 @@ ContractStaff* StaffManager::GetContractStaff(std::string strFullname) {
 	else {
 		return NULL;
 	}
+}
+
+size_t StaffManager::CountSeniorStaff() {
+	size_t count = 0;
+	std::for_each(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&count](SalariedStaff& item) {
+		if (item.GetSenior()) count++;
+	});
+	return count;
+}
+
+size_t StaffManager::CountStandardStaff() {
+	size_t count = 0;
+	std::for_each(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&count](SalariedStaff& item) {
+		if (!item.GetSenior()) count++;
+	});
+	return count;
 }

@@ -2,6 +2,9 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <iostream>
+#include <sstream>
 #include "Staff.h"
 
 #ifndef STAFFMANAGER_H
@@ -14,8 +17,17 @@ public:
 	void AddSalariedStaff(SalariedStaff objSalariedStaff);
 	void AddContractStaff(ContractStaff objContractStaff);
 
+	void RemoveSalariedStaff(std::string strFullName);
+	void RemoveContractStaff(std::string strFullName);
+
 	SalariedStaff* GetSalariedStaff(std::string strFullName);
 	ContractStaff* GetContractStaff(std::string strFullName);
+
+	std::vector<SalariedStaff>* GetPtrSalariedStaff() { return &_vecSalariedStaff; }
+	std::vector<ContractStaff>* GetPtrContractStaff() { return &_vecContractStaff; }
+
+	size_t CountSeniorStaff();
+	size_t CountStandardStaff();
 };
 
 #endif // STAFFMANAGER_H
