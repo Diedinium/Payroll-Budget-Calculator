@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include "Utilities.h"
 
 #ifndef INPUTVALIDATOR_H
 #define INPUTVALIDATOR_H

@@ -6,9 +6,9 @@ void util::Pause() {
 }
 
 void util::OutputContractStaffHeader() {
-    std::cout << "----------------------------------------------------------------------------------------------------------\n";
+    std::cout << "-------------------------------------------------------------------------------------------------------------\n";
     std::cout << std::setw(4) << std::left << "Num" << std::setw(15) << std::left << "First Name" << std::setw(15) << std::left << "Last Name" << std::setw(25) << std::left << "Job Role" << std::setw(20) << std::left << "Department" << std::setw(8) << std::left << "Wage" << std::setw(12) << std::left << "Hours p/w" << std::setw(10) << std::left << "Contracted" << "\n";
-    std::cout << "----------------------------------------------------------------------------------------------------------\n";
+    std::cout << "-------------------------------------------------------------------------------------------------------------\n";
 }
 
 void util::OutputSalariedStaffHeader() {

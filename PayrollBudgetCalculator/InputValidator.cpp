@@ -25,7 +25,7 @@ int InputValidator::ValidateInt(int maxSize) {
 		try {
 			iInput = std::stoi(strInput);
 
-			if (iInput > maxSize) {
+			if (util::is_more_than(iInput, maxSize)) {
 				std::cout << "To large, max size is " << std::setprecision(2) << maxSize << ": ";
 			}
 			else {
@@ -63,7 +63,7 @@ double InputValidator::ValidateDouble(double maxSize) {
 		try {
 			dInput = std::stod(strInput);
 
-			if (dInput > maxSize) {
+			if (util::is_more_than(dInput, maxSize)) {
 				std::cout << "To large, max size is " << std::setprecision(2) << maxSize << ": ";
 			}
 			else {
@@ -89,7 +89,7 @@ std::string InputValidator::ValidateString(int maxLength) {
 		std::string strMessage = "Not a valid number";
 		std::getline(std::cin, strInput);
 
-		if (strInput.length() > (size_t)maxLength) {
+		if (util::is_more_than(strInput.length(), (size_t)maxLength)) {
 			strMessage = "To long, max length is " + std::to_string(maxLength);
 			std::cout << strMessage << ", try again: ";
 		}
