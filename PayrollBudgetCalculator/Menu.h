@@ -5,10 +5,16 @@
 #include <iomanip>
 #include "StaffManager.h"
 #include "InputValidator.h"
+#include "BudgetCalculator.h"
 
 #ifndef MENU_H
 #define MENU_H
-// Making use of the adapter design pattern here (all classes that ultimately inherit from MenuItem can have the Execute function called, which makes polymorthism possible)
+// Making use of the adapter design pattern here 
+
+/// <summary>
+/// Abstract menu item class so that the "adapter" design pattern can be used. 
+/// All classes that ultimately inherit from MenuItem can have the Execute function called, which makes polymorphism possible.
+/// </summary>
 class MenuItem {
 public:
     virtual ~MenuItem() {}
@@ -16,8 +22,10 @@ public:
     virtual void Execute() = 0;
 };
 
-// Stores a list of menu item pointers (as unique pointers), when execute is called it iterates through this and calls the execute for each menu item.
-// This allows menus to be dynamically created, and allows menus to be within menus (as the Execute function of a MenuItem can just instantiate a new menu container)
+/// <summary>
+/// Stores a list of menu item pointers (as unique pointers), when execute is called it iterates through this and calls the execute for each menu item.
+/// This allows menus to be dynamically created, and allows menus to be within menus (as the Execute function of a MenuItem can just instantiate a new menu container).
+/// </summary>
 class MenuContainer {
 private:
     std::string _strText;
@@ -32,6 +40,11 @@ public:
 };
 
 // Not worth putting these properties in the base abstract class, don't want to have to override them when creating each MenuItem.
+
+/// <summary>
+/// Each menu item will need a process to handle the output (ItemText), so a general menu item is created to implement this - most other menu items then inherit this class 
+/// and use it's base constructor.
+/// </summary>
 class GeneralMenuItem : public MenuItem {
 private:
     std::string _output;
@@ -57,8 +70,9 @@ public:
 };
 
 class MenuCalculateBudget : public GeneralMenuItem {
+    BudgetCalculator* _ptrBudgetCalculator;
 public:
-    MenuCalculateBudget(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    MenuCalculateBudget(std::string output, BudgetCalculator* budgetCalculator) : GeneralMenuItem(output, budgetCalculator->GetStaffManagerPtr()) { _ptrBudgetCalculator = budgetCalculator; }
     void Execute();
 };
 
@@ -205,6 +219,55 @@ public:
 class ActionMenuUpdateContractWeeks : public ActionMenuContractStaffBase {
 public:
     ActionMenuUpdateContractWeeks(std::string output, ContractStaff* contractStaff) : ActionMenuContractStaffBase(output, contractStaff) { }
+    void Execute();
+};
+
+/// <summary>
+/// Base class for menu items that will be involved in the budget calculation process, requires a BudgetCalculator instance instead of a staff manager instance, gets staff manager pointer 
+/// from the budget calculator.
+/// </summary>
+class MenuCalculateBudgetBase : public GeneralMenuItem {
+protected:
+    BudgetCalculator* _ptrBudgetCalculator;
+public:
+    MenuCalculateBudgetBase(std::string output, BudgetCalculator* budgetCalculator) : GeneralMenuItem(output, budgetCalculator->GetStaffManagerPtr()) { _ptrBudgetCalculator = budgetCalculator; }
+};
+
+/// <summary>
+/// Uses the BudgetCalculator and StaffManager to display a report on the payroll budget.
+/// </summary>
+class SubMenuViewPayrollBudgetReport : public MenuCalculateBudgetBase {
+    std::vector<SalariedStaff>* _ptrSalariedStaff;
+    std::vector<ContractStaff>* _ptrContractStaff;
+public:
+    SubMenuViewPayrollBudgetReport(std::string output, BudgetCalculator* budgetCalculator);
+    void Execute();
+};
+
+/// <summary>
+/// Allows user to set the minimum budget overun percentage
+/// </summary>
+class SubMenuUpdateMinOverrun : public MenuCalculateBudgetBase {
+public:
+    SubMenuUpdateMinOverrun(std::string output, BudgetCalculator* budgetCalculator) : MenuCalculateBudgetBase(output, budgetCalculator) {}
+    void Execute();
+};
+
+/// <summary>
+/// Allows user to set the max budget overrun percentage.
+/// </summary>
+class SubMenuUpdateMaxOverrun : public MenuCalculateBudgetBase {
+public:
+    SubMenuUpdateMaxOverrun(std::string output, BudgetCalculator* budgetCalculator) : MenuCalculateBudgetBase(output, budgetCalculator) {}
+    void Execute();
+};
+
+/// <summary>
+/// Allows user to change the project length (in years), value from this is stored in BudgetCalculator and is simply used like a multiplier for the relevant costs.
+/// </summary>
+class SubMenuUpdateProjectLength : public MenuCalculateBudgetBase {
+public:
+    SubMenuUpdateProjectLength(std::string output, BudgetCalculator* budgetCalculator) : MenuCalculateBudgetBase(output, budgetCalculator) {}
     void Execute();
 };
 #endif // !MENU_H

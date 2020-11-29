@@ -16,6 +16,7 @@ public:
 	static int ValidateInt(int maxSize);
 	static double ValidateDouble();
 	static double ValidateDouble(double maxSize);
+	static double ValidateDouble(double minSize, double maxSize);
 	static std::string ValidateString();
 	static std::string ValidateString(int maxLength);
 };

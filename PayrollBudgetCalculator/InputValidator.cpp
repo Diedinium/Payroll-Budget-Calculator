@@ -76,6 +76,28 @@ double InputValidator::ValidateDouble(double maxSize) {
 	}
 }
 
+double InputValidator::ValidateDouble(double minSize, double maxSize) {
+	std::string strInput;
+	double dInput;
+
+	while (true) {
+		std::getline(std::cin, strInput);
+		try {
+			dInput = std::stod(strInput);
+
+			if (!util::is_between(minSize, maxSize, dInput)) {
+				std::cout << "Input not within valid range (" << minSize << " to " << maxSize << ") : ";
+			}
+			else {
+				return dInput;
+			}
+		}
+		catch (std::exception) {
+			std::cout << "Not a valid number: ";
+		}
+	}
+}
+
 std::string InputValidator::ValidateString() {
 	std::string strInput;
 	std::getline(std::cin, strInput);

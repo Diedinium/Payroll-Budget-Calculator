@@ -45,3 +45,15 @@ void util::OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff) 
 			<< std::fixed << std::setw(10) << std::left << (item.GetSenior() == true ? "Yes" : "No") << "\n";
 		});
 }
+
+/// <summary>
+/// Gets the current datetime in the time struct, which can then be output using std::put_time
+/// </summary>
+/// <returns>struct std::tm</returns>
+std::tm util::GetCurrentDateTimeStruct() {
+	// Why is getting the current date in C++ such a damn pain? Seriouly, I spent half an hour figuring out how to make this work!
+	std::time_t date = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	struct std::tm tm;
+	localtime_s(&tm, &date);
+	return tm;
+}
