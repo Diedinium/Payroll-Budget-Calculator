@@ -41,5 +41,11 @@ public:
 
 	double GetSeniorSalaryTotal() { return _dSeniorSalaryTotal; }
 	double GetSeniorSalaryAverage() { return _dSeniorSalaryAverage; }
+
+	double GetSalariedSalaryTotal() { return _dSalariedSalaryTotal; }
+	double GetSalariedSalaryAverage() { return _dSalariedSalaryAverage; }
+
+	double GetContractorCostTotal() { return _dContractPayTotal; }
+	double GetContractorCostAverage() { return _dContractPayAverage; }
 };
 #endif // !H_BUDGETCALCULATOR

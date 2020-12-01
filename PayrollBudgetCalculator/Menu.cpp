@@ -592,8 +592,12 @@ void SubMenuViewPayrollBudgetReport::Execute() {
 		_ptrBudgetCalculator->Calculate();
 
 		std::cout << "--- Costs per year ---\n\n";
-		std::cout << "Senior staff total salary: " << _ptrBudgetCalculator->GetSeniorSalaryTotal() << "\n";
-		std::cout << "Senior staff average salary: " << _ptrBudgetCalculator->GetSeniorSalaryAverage() << "\n";
+		std::cout << "Senior staff total salary: " << char(156) << _ptrBudgetCalculator->GetSeniorSalaryTotal() << "\n";
+		std::cout << "Senior staff average salary: " << char(156) << _ptrBudgetCalculator->GetSeniorSalaryAverage() << "\n\n";
+		std::cout << "Salaried staff total salary: " << char(156) << _ptrBudgetCalculator->GetSalariedSalaryTotal() << "\n";
+		std::cout << "Salaried staff average salary: " << char(156) << _ptrBudgetCalculator->GetSalariedSalaryAverage() << "\n\n";
+		std::cout << "Contractor total costs: " << char(156) << _ptrBudgetCalculator->GetContractorCostTotal() << "\n";
+		std::cout << "Contractor average costs: " << char(156) << _ptrBudgetCalculator->GetContractorCostAverage() << "\n\n";
 
 		util::Pause();
 	}

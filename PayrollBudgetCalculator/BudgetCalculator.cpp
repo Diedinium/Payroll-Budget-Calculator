@@ -16,15 +16,24 @@ BudgetCalculator::BudgetCalculator(StaffManager* staffManager) {
 }
 
 void BudgetCalculator::Calculate() {
-	_dSeniorSalaryTotal = std::accumulate(_ptrVecSalariedStaff->begin(), _ptrVecSalariedStaff->end(), 0.0, [](double d, SalariedStaff& obj) 
-		{ 
-			if (obj.GetSenior()) return obj.GetSalary() + d;
-			else return 0.0;
+	std::for_each(_ptrVecSalariedStaff->begin(), _ptrVecSalariedStaff->end(), [&](SalariedStaff obj) {
+		if (obj.GetSenior()) {
+			_dSeniorSalaryTotal += obj.GetSalary();
+		}
+		else {
+			_dSalariedSalaryTotal += obj.GetSalary();
+		}
+	});
+
+	_dSeniorSalaryAverage = (_dSeniorSalaryTotal > 0.0 ? _dSeniorSalaryTotal / _ptrStaffManager->CountSeniorStaff() : 0.0);
+	_dSalariedSalaryAverage = (_dSalariedSalaryTotal > 0.0 ? _dSalariedSalaryTotal / _ptrStaffManager->CountStandardStaff() : 0.0);
+
+	_dContractPayTotal = std::accumulate(_ptrVecContractStaff->begin(), _ptrVecContractStaff->end(), 0.0, [](double d, ContractStaff obj)
+		{
+			return obj.GetWage() * obj.GetWeeklyHours() * (double)obj.GetWeeks();
 		});
-	_dSeniorSalaryAverage = std::accumulate(_ptrVecSalariedStaff->begin(), _ptrVecSalariedStaff->end(), 0.0, [](double d, SalariedStaff& obj) 
-		{ 
-			if (obj.GetSenior()) return obj.GetSalary() + d;
-			else return 0.0;
+	_dContractPayAverage = std::accumulate(_ptrVecContractStaff->begin(), _ptrVecContractStaff->end(), 0.0, [&](double d, ContractStaff obj)
+		{
+			return (obj.GetWage() * obj.GetWeeklyHours() * (double)obj.GetWeeks()) / _ptrStaffManager->CountContractStaff();
 		});
-	_dSeniorSalaryAverage = (_dSeniorSalaryAverage > 0.0 ? _dSeniorSalaryAverage / _ptrStaffManager->CountSeniorStaff() : 0.0);
 }
