@@ -544,66 +544,90 @@ SubMenuViewPayrollBudgetReport::SubMenuViewPayrollBudgetReport(std::string outpu
 }
 
 void SubMenuViewPayrollBudgetReport::Execute() {
-	system("cls");
-	struct std::tm timeNow = util::GetCurrentDateTimeStruct();
+	MenuContainer objMenuContainer = MenuContainer("Choose action.\n");
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return", &objMenuContainer)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuSaveLoad("Save this report", _ptrStaffManager)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuAddStaffMember("Add staff member", _ptrStaffManager)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuUpdateStaff("Update staff member", _ptrStaffManager)));
 
-	std::cout << "Payroll budget report\n\n";
+	while (!objMenuContainer.GetExitMenu()) {
+		system("cls");
+		struct std::tm timeNow = util::GetCurrentDateTimeStruct();
 
-	if (_ptrSalariedStaff->size() > 0 || _ptrContractStaff->size() > 0) {
-		std::cout.imbue(std::locale("en_GB"));
-		std::cout << "Report date: " << std::put_time(&timeNow, "%c") << "\n\n";
+		std::cout << "Payroll budget report\n\n";
 
-		if (_ptrStaffManager->CountSeniorStaff() > 0) {
-			std::cout << "Number of senior staff assigned to project: " << _ptrStaffManager->CountSeniorStaff() << "\n";
-			std::cout << "Names: ";
-			std::for_each(_ptrSalariedStaff->begin(), _ptrSalariedStaff->end(), [](SalariedStaff salariedStaff) {
-				if (salariedStaff.GetSenior()) std::cout << salariedStaff.GetFullName() << ", ";
-				});
-			std::cout << "\b\b" << "  " << "\n\n";
+		if (_ptrSalariedStaff->size() > 0 || _ptrContractStaff->size() > 0) {
+			std::cout.imbue(std::locale("en_GB"));
+			std::cout << "Report date: " << std::put_time(&timeNow, "%c") << "\n\n";
+
+			if (_ptrStaffManager->CountSeniorStaff() > 0) {
+				std::cout << "Number of senior staff assigned to project: " << _ptrStaffManager->CountSeniorStaff() << "\n";
+				std::cout << "Names: ";
+				std::for_each(_ptrSalariedStaff->begin(), _ptrSalariedStaff->end(), [](SalariedStaff salariedStaff) {
+					if (salariedStaff.GetSenior()) std::cout << salariedStaff.GetFullName() << ", ";
+					});
+				std::cout << "\b\b" << "  " << "\n\n";
+			}
+			else {
+				std::cout << "No senior staff added for this project.\n\n";
+			}
+
+			if (_ptrStaffManager->CountStandardStaff() > 0) {
+				std::cout << "Number of salaried staff assigned to project: " << _ptrStaffManager->CountStandardStaff() << "\n";
+				std::cout << "Names: ";
+				std::for_each(_ptrSalariedStaff->begin(), _ptrSalariedStaff->end(), [](SalariedStaff salariedStaff) {
+					if (!salariedStaff.GetSenior()) std::cout << salariedStaff.GetFullName() << ", ";
+					});
+				std::cout << "\b\b" << "  " << "\n\n";
+			}
+			else {
+				std::cout << "No salaried staff added for this project.\n\n";
+			}
+
+			if (_ptrStaffManager->CountContractStaff() > 0) {
+				std::cout << "Number of contract staff assigned to project: " << _ptrStaffManager->CountContractStaff() << "\n";
+				std::cout << "Names: ";
+				std::for_each(_ptrContractStaff->begin(), _ptrContractStaff->end(), [](Staff contractStaff) {
+					std::cout << contractStaff.GetFullName() << ", ";
+					});
+				std::cout << "\b\b" << "  " << "\n\n";
+			}
+			else {
+				std::cout << "No contract staff added for this project.\n\n";
+			}
+
+			_ptrBudgetCalculator->Calculate();
+
+			std::cout.precision(2);
+			std::cout << std::fixed << "--- Costs per year ---\n\n";
+			std::cout << "Senior staff total salary: " << char(156) << _ptrBudgetCalculator->GetSeniorSalaryTotal() << "\n";
+			std::cout << "Senior staff average salary: " << char(156) << _ptrBudgetCalculator->GetSeniorSalaryAverage() << "\n\n";
+			std::cout << "Salaried staff total salary: " << char(156) << _ptrBudgetCalculator->GetSalariedSalaryTotal() << "\n";
+			std::cout << "Salaried staff average salary: " << char(156) << _ptrBudgetCalculator->GetSalariedSalaryAverage() << "\n\n";
+			std::cout << "Contractor total costs: " << char(156) << _ptrBudgetCalculator->GetContractorCostTotal() << "\n";
+			std::cout << "Contractor average costs: " << char(156) << _ptrBudgetCalculator->GetContractorCostAverage() << "\n\n";
+			std::cout << "Total payroll cost: " << char(156) << _ptrBudgetCalculator->GetTotalPayroll() << "\n";
+			std::cout << "Total payroll cost (with overrun): (Min - " << _ptrBudgetCalculator->GetMinOverPercent() << "%) " << char(156) << _ptrBudgetCalculator->GetMinimumOverBudget() << " - "
+				<< "(Max - " << _ptrBudgetCalculator->GetMaxOverPercent() << "%) " << char(156) << _ptrBudgetCalculator->GetMaximumOverBudget() << "\n\n";
+
+			if (!_ptrBudgetCalculator->GetProjectIsDefaultDuration()) {
+				std::cout << "--- Costs over tatal project length of " << _ptrBudgetCalculator->GetProjectLength() << " years " << "---\n\n";
+				std::cout << "Senior staff total salary: " << char(156) << _ptrBudgetCalculator->GetProjLenSeniorSalaryTotal() << "\n";
+				std::cout << "Salaried staff total salary: " << char(156) << _ptrBudgetCalculator->GetProjLenSalariedSalaryTotal() << "\n";
+				std::cout << "Contractor total costs: " << char(156) << _ptrBudgetCalculator->GetProjLenContractPayTotal() << "\n";
+				std::cout << "Total payroll cost: " << char(156) << _ptrBudgetCalculator->GetProjLenTotalPayroll() << "\n";
+				std::cout << "Total payroll cost (with overrun): (Min - " << _ptrBudgetCalculator->GetMinOverPercent() << "%) " << char(156) << _ptrBudgetCalculator->GetProjLenMinimumOverBudget() << " - "
+					<< "(Max - " << _ptrBudgetCalculator->GetMaxOverPercent() << "%) " << char(156) << _ptrBudgetCalculator->GetProjLenMaximumOverBudget() << "\n\n";
+			}
+
+			objMenuContainer.Execute();
 		}
 		else {
-			std::cout << "No senior staff added for this project.\n\n";
+			std::cout << "ERROR: You cannot calculate a payroll budget with no staff in the system.\nPlease go and add at least one staff member, or the recommended 3 senior, 5 salaried and 5 contract staff\n";
+			objMenuContainer.SetExitMenu(true);
+			util::Pause();
 		}
-
-		if (_ptrStaffManager->CountStandardStaff() > 0) {
-			std::cout << "Number of salaried staff assigned to project: " << _ptrStaffManager->CountStandardStaff() << "\n";
-			std::cout << "Names: ";
-			std::for_each(_ptrSalariedStaff->begin(), _ptrSalariedStaff->end(), [](SalariedStaff salariedStaff) {
-				if (!salariedStaff.GetSenior()) std::cout << salariedStaff.GetFullName() << ", ";
-				});
-			std::cout << "\b\b" << "  " << "\n\n";
-		}
-		else {
-			std::cout << "No salaried staff added for this project.\n\n";
-		}
-
-		if (_ptrStaffManager->CountContractStaff() > 0) {
-			std::cout << "Number of contract staff assigned to project: " << _ptrStaffManager->CountContractStaff() << "\n";
-			std::cout << "Names: ";
-			std::for_each(_ptrContractStaff->begin(), _ptrContractStaff->end(), [](Staff contractStaff) {
-				std::cout << contractStaff.GetFullName() << ", ";
-				});
-			std::cout << "\b\b" << "  " << "\n\n";
-		}
-		else {
-			std::cout << "No contract staff added for this project.\n\n";
-		}
-
-		_ptrBudgetCalculator->Calculate();
-
-		std::cout << "--- Costs per year ---\n\n";
-		std::cout << "Senior staff total salary: " << char(156) << _ptrBudgetCalculator->GetSeniorSalaryTotal() << "\n";
-		std::cout << "Senior staff average salary: " << char(156) << _ptrBudgetCalculator->GetSeniorSalaryAverage() << "\n\n";
-		std::cout << "Salaried staff total salary: " << char(156) << _ptrBudgetCalculator->GetSalariedSalaryTotal() << "\n";
-		std::cout << "Salaried staff average salary: " << char(156) << _ptrBudgetCalculator->GetSalariedSalaryAverage() << "\n\n";
-		std::cout << "Contractor total costs: " << char(156) << _ptrBudgetCalculator->GetContractorCostTotal() << "\n";
-		std::cout << "Contractor average costs: " << char(156) << _ptrBudgetCalculator->GetContractorCostAverage() << "\n\n";
-
-		util::Pause();
-	}
-	else {
-		std::cout << "ERROR: You cannot calculate a payroll budget with no staff in the system.\nPlease go and add at least one staff member, or the recommended 3 senior, 5 salaried and 5 contract staff\n";
-		util::Pause();
+		
 	}
 }
 
@@ -614,7 +638,7 @@ void SubMenuUpdateMinOverrun::Execute() {
 	double dInput = InputValidator::ValidateDouble(0, 100);
 	if (dInput < _ptrBudgetCalculator->GetMaxOverPercent()) {
 		_ptrBudgetCalculator->SetMinOverPercent(dInput);
-		std::cout << "Minimum budget overrun updated to " << std::setprecision(2) << _ptrBudgetCalculator->GetMinOverPercent() << "%\n";
+		std::cout << "Minimum budget overrun updated to "  << _ptrBudgetCalculator->GetMinOverPercent() << "%\n";
 		util::Pause();
 	}
 	else {
@@ -630,7 +654,7 @@ void SubMenuUpdateMaxOverrun::Execute() {
 	double dInput = InputValidator::ValidateDouble(0, 100);
 	if (dInput > _ptrBudgetCalculator->GetMinOverPercent()) {
 		_ptrBudgetCalculator->SetMaxOverPercent(dInput);
-		std::cout << "Maximum budget overrun updated to " << std::setprecision(2) << _ptrBudgetCalculator->GetMaxOverPercent() << "%\n";
+		std::cout << "Maximum budget overrun updated to "  << _ptrBudgetCalculator->GetMaxOverPercent() << "%\n";
 		util::Pause();
 	}
 	else {
@@ -645,6 +669,6 @@ void SubMenuUpdateProjectLength::Execute() {
 	std::cout << "Enter project length: ";
 	double dInput = InputValidator::ValidateDouble();
 	_ptrBudgetCalculator->SetProjectLength(dInput);
-	std::cout << "Project length updated to " << std::setprecision(2) << _ptrBudgetCalculator->GetProjectLength() << " years\n";
+	std::cout << "Project length updated to "  << _ptrBudgetCalculator->GetProjectLength() << " years\n";
 	util::Pause();
 }

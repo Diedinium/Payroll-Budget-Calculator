@@ -22,13 +22,13 @@ void util::OutputContractStaff(std::vector<ContractStaff>* ptrVecContractStaff) 
 		std::cout.precision(2);
 		std::cout
 			<< std::fixed << std::setw(4) << std::left << index
-			<< std::fixed << std::setw(15) << std::left << item.GetFirstName()
-			<< std::fixed << std::setw(15) << std::left << item.GetLastName()
-			<< std::fixed << std::setw(25) << std::left << item.GetJobRole()
-			<< std::fixed << std::setw(20) << std::left << item.GetDepartment()
-			<< std::fixed << std::setw(8) << std::left << item.GetWage()
-			<< std::fixed << std::setw(12) << std::left << item.GetWeeklyHours()
-			<< std::fixed << std::setw(10) << std::left << item.GetWeeksFormatted() << "\n";
+			<< std::setw(15) << std::left << item.GetFirstName()
+			<< std::setw(15) << std::left << item.GetLastName()
+			<< std::setw(25) << std::left << item.GetJobRole()
+			<< std::setw(20) << std::left << item.GetDepartment()
+			<< std::setw(8) << std::left << item.GetWage()
+			<< std::setw(12) << std::left << item.GetWeeklyHours()
+			<< std::setw(10) << std::left << item.GetWeeksFormatted() << "\n";
 		});
 }
 
@@ -37,12 +37,12 @@ void util::OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff) 
 		std::cout.precision(2);
 		std::cout
 			<< std::fixed << std::setw(4) << std::left << index
-			<< std::fixed << std::setw(15) << std::left << item.GetFirstName()
-			<< std::fixed << std::setw(15) << std::left << item.GetLastName()
-			<< std::fixed << std::setw(25) << std::left << item.GetJobRole()
-			<< std::fixed << std::setw(20) << std::left << item.GetDepartment()
-			<< std::fixed << std::setw(12) << std::left << item.GetSalary()
-			<< std::fixed << std::setw(10) << std::left << (item.GetSenior() == true ? "Yes" : "No") << "\n";
+			<< std::setw(15) << std::left << item.GetFirstName()
+			<< std::setw(15) << std::left << item.GetLastName()
+			<< std::setw(25) << std::left << item.GetJobRole()
+			<< std::setw(20) << std::left << item.GetDepartment()
+			<< std::setw(12) << std::left << item.GetSalary()
+			<< std::setw(10) << std::left << (item.GetSenior() == true ? "Yes" : "No") << "\n";
 		});
 }
 
