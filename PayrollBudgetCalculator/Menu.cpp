@@ -53,9 +53,28 @@ void MenuExit::Execute() {
 };
 
 void MenuCalculateBudget::Execute() {
-	system("cls");
-	std::cout << "Calculate budget or view reports menu\nThis is a placeholder menu option...\n";
-	util::Pause();
+	MenuContainer objMenuContainer = MenuContainer("\nChoose one of the below options.\n");
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return to menu", &objMenuContainer)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuViewPayrollBudgetReport("View payroll budget report", _ptrBudgetCalculator)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuUpdateMinOverrun("Set minimum budget overrun", _ptrBudgetCalculator)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuUpdateMaxOverrun("Set maximum budget overrun", _ptrBudgetCalculator)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuUpdateProjectLength("Set project length", _ptrBudgetCalculator)));
+
+	while (!objMenuContainer.GetExitMenu()) {
+		system("cls");
+		std::cout << "Payroll budget calculation menu\n";
+		std::cout << "\nCurrent project length: " << _ptrBudgetCalculator->GetProjectLength() << ((_ptrBudgetCalculator->GetProjectLength() <= 1) ? " year" : " years") << "\n";
+		std::cout << "Budget overrun: " << _ptrBudgetCalculator->GetMinOverPercent() << "% - " << _ptrBudgetCalculator->GetMaxOverPercent() << "%\n";
+		if (_ptrStaffManager->CountSeniorStaff() < 3) std::cout << "WARNING: You currently only have " << _ptrStaffManager->CountSeniorStaff() <<
+			" senior staff, this is below the recommended 3 senior staff for a project.\n";
+
+		if (_ptrStaffManager->CountStandardStaff() < 5) std::cout << "WARNING: You currently only have " << _ptrStaffManager->CountStandardStaff() <<
+			" salaried staff, this is below the recommended 5 salaried staff for a project.\n";
+
+		if (_ptrStaffManager->CountContractStaff() < 5) std::cout << "WARNING: You currently only have " << _ptrStaffManager->CountContractStaff() <<
+			" contract staff, this is below the recommended 5 contracted staff for a project.\n";
+		objMenuContainer.Execute();
+	}
 };
 
 void MenuSaveLoad::Execute() {
@@ -138,7 +157,7 @@ void SubMenuAddSalariedStaff::Execute() {
 	std::string strFirstName, strLastName, strJobRole, strDepartment;
 	int iSeniorStatus;
 	SalariedStaff objSalariedStaff;
-	
+
 	std::cout << "First Name: ";
 	strFirstName = InputValidator::ValidateString(15);
 	std::cout << "Last Name: ";
@@ -229,7 +248,7 @@ void SubMenuRemoveSalariedStaffMember::Execute() {
 			std::cout << "No salaried staff found.\n";
 			boolExitWhile = true;
 			util::Pause();
-		} 
+		}
 		else {
 			util::OutputSalariedStaffHeader();
 			util::OutputSalariedStaff(ptrVecSalariedStaff);
@@ -469,9 +488,9 @@ void ActionMenuUpdateSalariedSeniorStatus::Execute() {
 	std::string strSeniorStatus = InputValidator::ValidateString(5);
 
 	bool boolStatusIsTrue = util::find_substring_case_insensitive(strSeniorStatus, std::string("true"));
-	
-	if (boolStatusIsTrue) 
-	{ 
+
+	if (boolStatusIsTrue)
+	{
 		_ptrSalariedStaff->SetSenior(true);
 		std::cout << "Senior status updated\n";
 		util::Pause();
@@ -484,7 +503,7 @@ void ActionMenuUpdateSalariedSeniorStatus::Execute() {
 			std::cout << "Senior status updated\n";
 			util::Pause();
 		}
-		else { 
+		else {
 			std::cout << strSeniorStatus << " is not a valid senior status\n";
 			util::Pause();
 		}
@@ -515,5 +534,141 @@ void ActionMenuUpdateContractWeeks::Execute() {
 
 	_ptrContractStaff->SetWeeks(dContractedWeeks);
 	std::cout << "Contracted weeks updated\n";
+	util::Pause();
+}
+
+SubMenuViewPayrollBudgetReport::SubMenuViewPayrollBudgetReport(std::string output, BudgetCalculator* budgetCalculator) : MenuCalculateBudgetBase(output, budgetCalculator)
+{
+	_ptrSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
+	_ptrContractStaff = _ptrStaffManager->GetPtrContractStaff();
+}
+
+void SubMenuViewPayrollBudgetReport::Execute() {
+	MenuContainer objMenuContainer = MenuContainer("Choose action.\n");
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return", &objMenuContainer)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuSaveLoad("Save this report", _ptrStaffManager)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuAddStaffMember("Add staff member", _ptrStaffManager)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuUpdateStaff("Update staff member", _ptrStaffManager)));
+
+	while (!objMenuContainer.GetExitMenu()) {
+		system("cls");
+		struct std::tm timeNow = util::GetCurrentDateTimeStruct();
+
+		std::cout << "Payroll budget report\n\n";
+
+		if (_ptrSalariedStaff->size() > 0 || _ptrContractStaff->size() > 0) {
+			std::cout.imbue(std::locale("en_GB"));
+			std::cout << "Report date: " << std::put_time(&timeNow, "%c") << "\n\n";
+
+			if (_ptrStaffManager->CountSeniorStaff() > 0) {
+				std::cout << "Number of senior staff assigned to project: " << _ptrStaffManager->CountSeniorStaff() << "\n";
+				std::cout << "Names: ";
+				std::for_each(_ptrSalariedStaff->begin(), _ptrSalariedStaff->end(), [](SalariedStaff salariedStaff) {
+					if (salariedStaff.GetSenior()) std::cout << salariedStaff.GetFullName() << ", ";
+					});
+				std::cout << "\b\b" << "  " << "\n\n";
+			}
+			else {
+				std::cout << "No senior staff added for this project.\n\n";
+			}
+
+			if (_ptrStaffManager->CountStandardStaff() > 0) {
+				std::cout << "Number of salaried staff assigned to project: " << _ptrStaffManager->CountStandardStaff() << "\n";
+				std::cout << "Names: ";
+				std::for_each(_ptrSalariedStaff->begin(), _ptrSalariedStaff->end(), [](SalariedStaff salariedStaff) {
+					if (!salariedStaff.GetSenior()) std::cout << salariedStaff.GetFullName() << ", ";
+					});
+				std::cout << "\b\b" << "  " << "\n\n";
+			}
+			else {
+				std::cout << "No salaried staff added for this project.\n\n";
+			}
+
+			if (_ptrStaffManager->CountContractStaff() > 0) {
+				std::cout << "Number of contract staff assigned to project: " << _ptrStaffManager->CountContractStaff() << "\n";
+				std::cout << "Names: ";
+				std::for_each(_ptrContractStaff->begin(), _ptrContractStaff->end(), [](Staff contractStaff) {
+					std::cout << contractStaff.GetFullName() << ", ";
+					});
+				std::cout << "\b\b" << "  " << "\n\n";
+			}
+			else {
+				std::cout << "No contract staff added for this project.\n\n";
+			}
+
+			_ptrBudgetCalculator->Calculate();
+
+			std::cout.precision(2);
+			std::cout << std::fixed << "--- Costs per year ---\n\n";
+			std::cout << "Senior staff total salary: " << char(156) << _ptrBudgetCalculator->GetSeniorSalaryTotal() << "\n";
+			std::cout << "Senior staff average salary: " << char(156) << _ptrBudgetCalculator->GetSeniorSalaryAverage() << "\n\n";
+			std::cout << "Salaried staff total salary: " << char(156) << _ptrBudgetCalculator->GetSalariedSalaryTotal() << "\n";
+			std::cout << "Salaried staff average salary: " << char(156) << _ptrBudgetCalculator->GetSalariedSalaryAverage() << "\n\n";
+			std::cout << "Contractor total costs: " << char(156) << _ptrBudgetCalculator->GetContractorCostTotal() << "\n";
+			std::cout << "Contractor average costs: " << char(156) << _ptrBudgetCalculator->GetContractorCostAverage() << "\n\n";
+			std::cout << "Total payroll cost: " << char(156) << _ptrBudgetCalculator->GetTotalPayroll() << "\n";
+			std::cout << "Total payroll cost (with overrun): (Min - " << _ptrBudgetCalculator->GetMinOverPercent() << "%) " << char(156) << _ptrBudgetCalculator->GetMinimumOverBudget() << " - "
+				<< "(Max - " << _ptrBudgetCalculator->GetMaxOverPercent() << "%) " << char(156) << _ptrBudgetCalculator->GetMaximumOverBudget() << "\n\n";
+
+			if (!_ptrBudgetCalculator->GetProjectIsDefaultDuration()) {
+				std::cout << "--- Costs over tatal project length of " << _ptrBudgetCalculator->GetProjectLength() << " years " << "---\n\n";
+				std::cout << "Senior staff total salary: " << char(156) << _ptrBudgetCalculator->GetProjLenSeniorSalaryTotal() << "\n";
+				std::cout << "Salaried staff total salary: " << char(156) << _ptrBudgetCalculator->GetProjLenSalariedSalaryTotal() << "\n";
+				std::cout << "Contractor total costs: " << char(156) << _ptrBudgetCalculator->GetProjLenContractPayTotal() << "\n";
+				std::cout << "Total payroll cost: " << char(156) << _ptrBudgetCalculator->GetProjLenTotalPayroll() << "\n";
+				std::cout << "Total payroll cost (with overrun): (Min - " << _ptrBudgetCalculator->GetMinOverPercent() << "%) " << char(156) << _ptrBudgetCalculator->GetProjLenMinimumOverBudget() << " - "
+					<< "(Max - " << _ptrBudgetCalculator->GetMaxOverPercent() << "%) " << char(156) << _ptrBudgetCalculator->GetProjLenMaximumOverBudget() << "\n\n";
+			}
+
+			objMenuContainer.Execute();
+		}
+		else {
+			std::cout << "ERROR: You cannot calculate a payroll budget with no staff in the system.\nPlease go and add at least one staff member, or the recommended 3 senior, 5 salaried and 5 contract staff\n";
+			objMenuContainer.SetExitMenu(true);
+			util::Pause();
+		}
+		
+	}
+}
+
+void SubMenuUpdateMinOverrun::Execute() {
+	system("cls");
+	std::cout << "Update minimum budget overrun percentage (0-100, must be less than current maximum budget overrun)\n";
+	std::cout << "Enter new minimum budget overun percentage: ";
+	double dInput = InputValidator::ValidateDouble(0, 100);
+	if (dInput < _ptrBudgetCalculator->GetMaxOverPercent()) {
+		_ptrBudgetCalculator->SetMinOverPercent(dInput);
+		std::cout << "Minimum budget overrun updated to "  << _ptrBudgetCalculator->GetMinOverPercent() << "%\n";
+		util::Pause();
+	}
+	else {
+		std::cout << "Error: Minimum budget overun could not be set, is more than the current max budget overrun\n";
+		util::Pause();
+	}
+}
+
+void SubMenuUpdateMaxOverrun::Execute() {
+	system("cls");
+	std::cout << "Update maxiumum budget overrun percentage (0-100, must be more than current minimum budget overrun)\n";
+	std::cout << "Enter new maximum budget overun percentage: ";
+	double dInput = InputValidator::ValidateDouble(0, 100);
+	if (dInput > _ptrBudgetCalculator->GetMinOverPercent()) {
+		_ptrBudgetCalculator->SetMaxOverPercent(dInput);
+		std::cout << "Maximum budget overrun updated to "  << _ptrBudgetCalculator->GetMaxOverPercent() << "%\n";
+		util::Pause();
+	}
+	else {
+		std::cout << "Error: Maximum budget overun could not be set, is less than the current minimum budget overrun\n";
+		util::Pause();
+	}
+}
+
+void SubMenuUpdateProjectLength::Execute() {
+	system("cls");
+	std::cout << "Update project length (in years, e.g. 1 for one year, 1.5 for one year and a half)\n";
+	std::cout << "Enter project length: ";
+	double dInput = InputValidator::ValidateDouble();
+	_ptrBudgetCalculator->SetProjectLength(dInput);
+	std::cout << "Project length updated to "  << _ptrBudgetCalculator->GetProjectLength() << " years\n";
 	util::Pause();
 }

@@ -33,6 +33,9 @@
     <ClCompile Include="Utilities.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="BudgetCalculator.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StaffManager.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BudgetCalculator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

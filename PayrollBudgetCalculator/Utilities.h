@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include <chrono>
 #include "Staff.h"
 
 #ifndef H_TEMPLATES
@@ -36,11 +37,17 @@ namespace util {
 		return number > compare;
 	}
 
+	template <typename T>
+	bool is_between(T min, T max, T compare) {
+		return compare > min && compare < max;
+	}
+
 	void Pause();
 	void OutputContractStaffHeader();
 	void OutputSalariedStaffHeader();
 	void OutputContractStaff(std::vector<ContractStaff>* ptrVecContractStaff);
 	void OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff);
+	std::tm GetCurrentDateTimeStruct();
 }
 
 #endif // !H_TEMPLATES

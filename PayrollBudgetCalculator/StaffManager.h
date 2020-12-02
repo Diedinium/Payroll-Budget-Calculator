@@ -28,6 +28,7 @@ public:
 
 	size_t CountSeniorStaff();
 	size_t CountStandardStaff();
+	size_t CountContractStaff();
 };
 
 #endif // STAFFMANAGER_H

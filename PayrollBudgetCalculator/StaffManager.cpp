@@ -81,3 +81,7 @@ size_t StaffManager::CountStandardStaff() {
 	});
 	return count;
 }
+
+size_t StaffManager::CountContractStaff() {
+	return _vecContractStaff.size();
+}

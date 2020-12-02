@@ -22,13 +22,13 @@ void util::OutputContractStaff(std::vector<ContractStaff>* ptrVecContractStaff) 
 		std::cout.precision(2);
 		std::cout
 			<< std::fixed << std::setw(4) << std::left << index
-			<< std::fixed << std::setw(15) << std::left << item.GetFirstName()
-			<< std::fixed << std::setw(15) << std::left << item.GetLastName()
-			<< std::fixed << std::setw(25) << std::left << item.GetJobRole()
-			<< std::fixed << std::setw(20) << std::left << item.GetDepartment()
-			<< std::fixed << std::setw(8) << std::left << item.GetWage()
-			<< std::fixed << std::setw(12) << std::left << item.GetWeeklyHours()
-			<< std::fixed << std::setw(10) << std::left << item.GetWeeksFormatted() << "\n";
+			<< std::setw(15) << std::left << item.GetFirstName()
+			<< std::setw(15) << std::left << item.GetLastName()
+			<< std::setw(25) << std::left << item.GetJobRole()
+			<< std::setw(20) << std::left << item.GetDepartment()
+			<< std::setw(8) << std::left << item.GetWage()
+			<< std::setw(12) << std::left << item.GetWeeklyHours()
+			<< std::setw(10) << std::left << item.GetWeeksFormatted() << "\n";
 		});
 }
 
@@ -37,11 +37,23 @@ void util::OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff) 
 		std::cout.precision(2);
 		std::cout
 			<< std::fixed << std::setw(4) << std::left << index
-			<< std::fixed << std::setw(15) << std::left << item.GetFirstName()
-			<< std::fixed << std::setw(15) << std::left << item.GetLastName()
-			<< std::fixed << std::setw(25) << std::left << item.GetJobRole()
-			<< std::fixed << std::setw(20) << std::left << item.GetDepartment()
-			<< std::fixed << std::setw(12) << std::left << item.GetSalary()
-			<< std::fixed << std::setw(10) << std::left << (item.GetSenior() == true ? "Yes" : "No") << "\n";
+			<< std::setw(15) << std::left << item.GetFirstName()
+			<< std::setw(15) << std::left << item.GetLastName()
+			<< std::setw(25) << std::left << item.GetJobRole()
+			<< std::setw(20) << std::left << item.GetDepartment()
+			<< std::setw(12) << std::left << item.GetSalary()
+			<< std::setw(10) << std::left << (item.GetSenior() == true ? "Yes" : "No") << "\n";
 		});
+}
+
+/// <summary>
+/// Gets the current datetime in the time struct, which can then be output using std::put_time
+/// </summary>
+/// <returns>struct std::tm</returns>
+std::tm util::GetCurrentDateTimeStruct() {
+	// Why is getting the current date in C++ such a damn pain? Seriouly, I spent half an hour figuring out how to make this work!
+	std::time_t date = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	struct std::tm tm;
+	localtime_s(&tm, &date);
+	return tm;
 }
