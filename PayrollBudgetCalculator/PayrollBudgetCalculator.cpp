@@ -5,11 +5,14 @@
 #include "StaffManager.h"
 #include "InputValidator.h"
 #include "Menu.h"
+#include "FileManager.h"
 
 int main()
 {
     StaffManager staffManager;
     BudgetCalculator budgetCalculator = BudgetCalculator(&staffManager);
+    FileManager fileManager;
+    fileManager.EnsureDirectoriesExist();
 
     staffManager.AddContractStaff(ContractStaff("Tobi", "Biddle", "Analyst", "IT", 15.25, 17, 25));
     staffManager.AddContractStaff(ContractStaff("Test1", "Biddle", "Analyst", "IT", 15.25, 17, 25));
@@ -27,8 +30,8 @@ int main()
     MenuContainer menuContainer = MenuContainer("Welcome to the payroll project budget calculator.\nPlease choose your option below.\n");
     menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Exit application", &menuContainer)));
     menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuStaffManagement("Manage Staff", &staffManager)));
-    menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuCalculateBudget("Calculate Budget or view reports", &budgetCalculator)));
-    menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuSaveLoad("Save or load data", &staffManager)));
+    menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuCalculateBudget("Calculate Budget or view reports", &budgetCalculator, &fileManager)));
+    menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuSaveLoad("Save or load data", &staffManager, &fileManager)));
 
     while (!menuContainer.GetExitMenu()) {
         system("cls");

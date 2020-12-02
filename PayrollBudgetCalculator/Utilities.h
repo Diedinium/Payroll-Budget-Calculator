@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <vector>
 #include <chrono>
+#include <filesystem>
+#include <time.h>
 #include "Staff.h"
 
 #ifndef H_TEMPLATES
@@ -42,11 +44,21 @@ namespace util {
 		return compare > min && compare < max;
 	}
 
+	template <typename T>
+	std::time_t to_time_t(T tp)
+	{
+		auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(tp - T::clock::now()
+			+ std::chrono::system_clock::now());
+		return std::chrono::system_clock::to_time_t(sctp);
+	}
+
 	void Pause();
 	void OutputContractStaffHeader();
 	void OutputSalariedStaffHeader();
+	void OutputFileListHeader();
 	void OutputContractStaff(std::vector<ContractStaff>* ptrVecContractStaff);
 	void OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff);
+	void OutputFileList(std::vector<std::filesystem::directory_entry>* ptrVecEntries);
 	std::tm GetCurrentDateTimeStruct();
 }
 

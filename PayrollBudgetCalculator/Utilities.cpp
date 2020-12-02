@@ -17,6 +17,15 @@ void util::OutputSalariedStaffHeader() {
     std::cout << "-------------------------------------------------------------------------------------------------------------\n";
 }
 
+/// <summary>
+/// Outputs a header for a table displaying list of current files in the saves directory.
+/// </summary>
+void util::OutputFileListHeader() {
+	std::cout << "------------------------------------------------------------------------------------------------------\n";
+	std::cout << std::setw(4) << std::left << "Num" << std::setw(25) << std::left << "Date created" << std::setw(50) << std::left << "File name" << "\n";
+	std::cout << "------------------------------------------------------------------------------------------------------\n";
+}
+
 void util::OutputContractStaff(std::vector<ContractStaff>* ptrVecContractStaff) {
 	util::for_each_iterator(ptrVecContractStaff->begin(), ptrVecContractStaff->end(), 0, [](int index, ContractStaff& item) {
 		std::cout.precision(2);
@@ -43,6 +52,24 @@ void util::OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff) 
 			<< std::setw(20) << std::left << item.GetDepartment()
 			<< std::setw(12) << std::left << item.GetSalary()
 			<< std::setw(10) << std::left << (item.GetSenior() == true ? "Yes" : "No") << "\n";
+		});
+}
+
+/// <summary>
+/// Outputs list of files that are in the passed Entries vector
+/// </summary>
+/// <param name="ptrVecEntries"></param>
+void util::OutputFileList(std::vector<std::filesystem::directory_entry>* ptrVecEntries) {
+	util::for_each_iterator(ptrVecEntries->begin(), ptrVecEntries->end(), 0, [](int index, std::filesystem::directory_entry& entry) {
+		std::time_t time = util::to_time_t(entry.last_write_time());
+		std::tm timeConverted;
+		localtime_s(&timeConverted, &time);
+		std::cout.imbue(std::locale("en_GB"));
+		std::cout.precision(2);
+		std::cout
+			<< std::fixed << std::setw(4) << std::left << index
+			<< std::setw(25) << std::left << std::put_time(&timeConverted, "%F %r %p")
+			<< std::setw(50) << std::left << entry.path().filename() << "\n";
 		});
 }
 

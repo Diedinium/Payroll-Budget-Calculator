@@ -52,10 +52,16 @@ void MenuExit::Execute() {
 	_ptrMenuContainer->SetExitMenu(true);
 };
 
+MenuCalculateBudget::MenuCalculateBudget(std::string output, BudgetCalculator* budgetCalculator, FileManager* fileManager) : GeneralMenuItem(output, budgetCalculator->GetStaffManagerPtr())
+{ 
+	_ptrBudgetCalculator = budgetCalculator; 
+	_ptrFileManager = fileManager;
+}
+
 void MenuCalculateBudget::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("\nChoose one of the below options.\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return to menu", &objMenuContainer)));
-	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuViewPayrollBudgetReport("View payroll budget report", _ptrBudgetCalculator)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuViewPayrollBudgetReport("View payroll budget report", _ptrBudgetCalculator, _ptrFileManager)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuUpdateMinOverrun("Set minimum budget overrun", _ptrBudgetCalculator)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuUpdateMaxOverrun("Set maximum budget overrun", _ptrBudgetCalculator)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuUpdateProjectLength("Set project length", _ptrBudgetCalculator)));
@@ -79,9 +85,39 @@ void MenuCalculateBudget::Execute() {
 
 void MenuSaveLoad::Execute() {
 	system("cls");
-	std::cout << "Save or Load menu\nThis is a placeholder menu option...\n";
-	util::Pause();
+	
+	MenuContainer objMenuContainer = MenuContainer("Save reports or save and load a project\n");
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return", &objMenuContainer)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuLoadProject("Load project", _ptrStaffManager, _ptrFileManager)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuSaveProject("Save current project", _ptrStaffManager, _ptrFileManager)));
+
+	while (!objMenuContainer.GetExitMenu()) {
+		system("cls");
+		objMenuContainer.Execute();
+	}
 };
+
+void SubMenuLoadProject::Execute() {
+	system("cls");
+	std::cout << "Files in saved directory\n";
+
+	std::vector<std::filesystem::directory_entry> vecEntries = _ptrFileManager->GetFilesFromSaveDirectory();
+
+	/*util::for_each_iterator(vecEntries.begin(), vecEntries.end(), 0, [](int index, std::filesystem::directory_entry entry) {
+		std::wcout << entry.path() << "\n";
+		std::cout << entry.path() << "\n";
+	});*/
+
+	util::OutputFileListHeader();
+	util::OutputFileList(&vecEntries);
+
+	util::Pause();
+}
+
+void SubMenuSaveProject::Execute() {
+	std::cout << "Save project, placeholder menu.\n";
+	util::Pause();
+}
 
 void MenuViewStaff::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("");
@@ -537,16 +573,17 @@ void ActionMenuUpdateContractWeeks::Execute() {
 	util::Pause();
 }
 
-SubMenuViewPayrollBudgetReport::SubMenuViewPayrollBudgetReport(std::string output, BudgetCalculator* budgetCalculator) : MenuCalculateBudgetBase(output, budgetCalculator)
+SubMenuViewPayrollBudgetReport::SubMenuViewPayrollBudgetReport(std::string output, BudgetCalculator* budgetCalculator, FileManager* fileManager) : MenuCalculateBudgetBase(output, budgetCalculator)
 {
 	_ptrSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
 	_ptrContractStaff = _ptrStaffManager->GetPtrContractStaff();
+	_ptrFileManager = fileManager;
 }
 
 void SubMenuViewPayrollBudgetReport::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("Choose action.\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return", &objMenuContainer)));
-	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuSaveLoad("Save this report", _ptrStaffManager)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuSaveLoad("Save this report", _ptrStaffManager, _ptrFileManager)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuAddStaffMember("Add staff member", _ptrStaffManager)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuUpdateStaff("Update staff member", _ptrStaffManager)));
 
