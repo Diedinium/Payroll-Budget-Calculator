@@ -61,15 +61,11 @@ void util::OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff) 
 /// <param name="ptrVecEntries"></param>
 void util::OutputFileList(std::vector<std::filesystem::directory_entry>* ptrVecEntries) {
 	util::for_each_iterator(ptrVecEntries->begin(), ptrVecEntries->end(), 0, [](int index, std::filesystem::directory_entry& entry) {
-		std::time_t time = util::to_time_t(entry.last_write_time());
-		std::tm timeConverted;
-		localtime_s(&timeConverted, &time);
-		std::cout.imbue(std::locale("en_GB"));
 		std::cout.precision(2);
 		std::cout
-			<< std::fixed << std::setw(4) << std::left << index
-			<< std::setw(25) << std::left << std::put_time(&timeConverted, "%F %r %p")
-			<< std::setw(50) << std::left << entry.path().filename() << "\n";
+			<< std::fixed << std::left << std::setw(4) << index
+			<< std::setw(25) << convertFileTimeToString(entry.last_write_time())
+			<< std::setw(50) << entry.path().filename() << "\n";
 		});
 }
 
@@ -83,4 +79,18 @@ std::tm util::GetCurrentDateTimeStruct() {
 	struct std::tm tm;
 	localtime_s(&tm, &date);
 	return tm;
+}
+
+/// <summary>
+/// Takes fileTime and returns as string of ISO date and 12 hour time
+/// </summary>
+/// <param name="fileTime"></param>
+/// <returns></returns>
+std::string util::convertFileTimeToString(std::filesystem::file_time_type fileTime) {
+	std::time_t tt = to_time_t(fileTime);
+	std::tm time;
+	localtime_s(&time, &tt);
+	std::stringstream ssBuffer;
+	ssBuffer << std::put_time(&time, "%F %I:%M %p");
+	return ssBuffer.str();
 }

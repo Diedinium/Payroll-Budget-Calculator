@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <algorithm>
 #include <conio.h>
 #include <iostream>
@@ -7,7 +8,7 @@
 #include <vector>
 #include <chrono>
 #include <filesystem>
-#include <time.h>
+#include <sstream>
 #include "Staff.h"
 
 #ifndef H_TEMPLATES
@@ -60,6 +61,7 @@ namespace util {
 	void OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff);
 	void OutputFileList(std::vector<std::filesystem::directory_entry>* ptrVecEntries);
 	std::tm GetCurrentDateTimeStruct();
+	std::string convertFileTimeToString(std::filesystem::file_time_type fileTime);
 }
 
 #endif // !H_TEMPLATES

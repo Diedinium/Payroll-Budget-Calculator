@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <fstream>
 #include "StaffManager.h"
 #include "InputValidator.h"
 #include "BudgetCalculator.h"

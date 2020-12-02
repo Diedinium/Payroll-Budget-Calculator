@@ -99,19 +99,60 @@ void MenuSaveLoad::Execute() {
 
 void SubMenuLoadProject::Execute() {
 	system("cls");
-	std::cout << "Files in saved directory\n";
+	std::cout << "Files in saved directory, please enter the number for the project you wish to import\n";
 
 	std::vector<std::filesystem::directory_entry> vecEntries = _ptrFileManager->GetFilesFromSaveDirectory();
 
-	/*util::for_each_iterator(vecEntries.begin(), vecEntries.end(), 0, [](int index, std::filesystem::directory_entry entry) {
-		std::wcout << entry.path() << "\n";
-		std::cout << entry.path() << "\n";
-	});*/
+	if (vecEntries.size() < 1) {
+		std::cout << "ERROR: No files found in the save directory\n\n";
+		util::Pause();
+	}
+	else {
+		util::OutputFileListHeader();
+		util::OutputFileList(&vecEntries);
 
-	util::OutputFileListHeader();
-	util::OutputFileList(&vecEntries);
+		std::string strInput;
 
-	util::Pause();
+		std::cout << "\nNOTE: Type esc to exit.\n";
+
+		while (!util::find_substring_case_insensitive(strInput, std::string("esc"))) {
+			std::cout << "\nEnter number of project to import: ";
+			strInput = InputValidator::ValidateString();
+
+			if (util::find_substring_case_insensitive(strInput, std::string("esc"))) {
+				continue;
+			}
+
+			try {
+				int iInput = std::stoi(strInput);
+
+				if (iInput > ((int)vecEntries.size() - 1) || iInput < 0) {
+					std::cout << "ERROR: Not a valid number, please try again: ";
+				}
+				else {
+					std::cout << "Reading " << vecEntries[iInput].path() << " ...\n";
+
+					std::ifstream ifstrReadFile;
+					std::string line;
+					ifstrReadFile.open(vecEntries[iInput].path());
+					std::cout << "(Temporary) File contents:\n";
+					while (ifstrReadFile.good()) {
+						std::getline(ifstrReadFile, line);
+						std::cout << line << "\n";
+					}
+
+					strInput = "esc";
+
+					util::Pause();
+				}
+			}
+			catch (std::exception) {
+				std::cout << "ERROR: Not valid input, please try again: ";
+			}
+		}
+	}
+
+	
 }
 
 void SubMenuSaveProject::Execute() {
