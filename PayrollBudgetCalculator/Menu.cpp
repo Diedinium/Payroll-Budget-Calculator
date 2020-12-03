@@ -53,8 +53,8 @@ void MenuExit::Execute() {
 };
 
 MenuCalculateBudget::MenuCalculateBudget(std::string output, BudgetCalculator* budgetCalculator, FileManager* fileManager) : GeneralMenuItem(output, budgetCalculator->GetStaffManagerPtr())
-{ 
-	_ptrBudgetCalculator = budgetCalculator; 
+{
+	_ptrBudgetCalculator = budgetCalculator;
 	_ptrFileManager = fileManager;
 }
 
@@ -85,7 +85,7 @@ void MenuCalculateBudget::Execute() {
 
 void MenuSaveLoad::Execute() {
 	system("cls");
-	
+
 	MenuContainer objMenuContainer = MenuContainer("Save reports or save and load a project\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return", &objMenuContainer)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuLoadProject("Load project", _ptrStaffManager, _ptrFileManager)));
@@ -151,13 +151,37 @@ void SubMenuLoadProject::Execute() {
 			}
 		}
 	}
-
-	
 }
 
 void SubMenuSaveProject::Execute() {
 	std::cout << "Save project, placeholder menu.\n";
 	util::Pause();
+
+	std::vector<SalariedStaff> testVector;
+
+	std::filesystem::path savePath = _ptrFileManager->GetSavesPath() /= L"TestJson.json";
+
+	json j;
+
+	j.push_back({ 
+		{"test", 35},
+		{"more", "valueHere"},
+		{"list", {1, 2, 3}}
+		});
+	j.push_back({
+			{"test", 38},
+			{"more", "valueHere2"},
+			{"list", {4, 5, 6}}
+		});
+
+	json j2;
+
+	j2["testArray1"] = j;
+	j2["testArray2"] = j;
+
+	std::ofstream ofStream(savePath);
+	ofStream << std::setw(4) << j2 << std::endl;
+	ofStream.close();
 }
 
 void MenuViewStaff::Execute() {
@@ -705,7 +729,7 @@ void SubMenuViewPayrollBudgetReport::Execute() {
 			objMenuContainer.SetExitMenu(true);
 			util::Pause();
 		}
-		
+
 	}
 }
 
@@ -716,7 +740,7 @@ void SubMenuUpdateMinOverrun::Execute() {
 	double dInput = InputValidator::ValidateDouble(0, 100);
 	if (dInput < _ptrBudgetCalculator->GetMaxOverPercent()) {
 		_ptrBudgetCalculator->SetMinOverPercent(dInput);
-		std::cout << "Minimum budget overrun updated to "  << _ptrBudgetCalculator->GetMinOverPercent() << "%\n";
+		std::cout << "Minimum budget overrun updated to " << _ptrBudgetCalculator->GetMinOverPercent() << "%\n";
 		util::Pause();
 	}
 	else {
@@ -732,7 +756,7 @@ void SubMenuUpdateMaxOverrun::Execute() {
 	double dInput = InputValidator::ValidateDouble(0, 100);
 	if (dInput > _ptrBudgetCalculator->GetMinOverPercent()) {
 		_ptrBudgetCalculator->SetMaxOverPercent(dInput);
-		std::cout << "Maximum budget overrun updated to "  << _ptrBudgetCalculator->GetMaxOverPercent() << "%\n";
+		std::cout << "Maximum budget overrun updated to " << _ptrBudgetCalculator->GetMaxOverPercent() << "%\n";
 		util::Pause();
 	}
 	else {
@@ -747,6 +771,6 @@ void SubMenuUpdateProjectLength::Execute() {
 	std::cout << "Enter project length: ";
 	double dInput = InputValidator::ValidateDouble();
 	_ptrBudgetCalculator->SetProjectLength(dInput);
-	std::cout << "Project length updated to "  << _ptrBudgetCalculator->GetProjectLength() << " years\n";
+	std::cout << "Project length updated to " << _ptrBudgetCalculator->GetProjectLength() << " years\n";
 	util::Pause();
 }

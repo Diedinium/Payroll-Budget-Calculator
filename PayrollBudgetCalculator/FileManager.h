@@ -14,5 +14,8 @@ public:
 	FileManager();
 	void EnsureDirectoriesExist();
 	std::vector<std::filesystem::directory_entry> GetFilesFromSaveDirectory();
+
+	std::filesystem::path GetOutputPath() { return _pathOutput; }
+	std::filesystem::path GetSavesPath() { return _pathSaves; }
 };
 #endif // !H_FILEMANAGER

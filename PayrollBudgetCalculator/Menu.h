@@ -4,6 +4,7 @@
 #include <string>
 #include <iomanip>
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include "StaffManager.h"
 #include "InputValidator.h"
 #include "BudgetCalculator.h"
@@ -11,6 +12,8 @@
 
 #ifndef MENU_H
 #define MENU_H
+using json = nlohmann::json;
+
 // Making use of the adapter design pattern here 
 
 /// <summary>
