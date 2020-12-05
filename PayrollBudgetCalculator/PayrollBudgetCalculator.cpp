@@ -11,7 +11,7 @@ int main()
 {
     StaffManager staffManager;
     BudgetCalculator budgetCalculator = BudgetCalculator(&staffManager);
-    FileManager fileManager;
+    FileManager fileManager = FileManager(&budgetCalculator);
     fileManager.EnsureDirectoriesExist();
 
     staffManager.AddContractStaff(ContractStaff("Tobi", "Biddle", "Analyst", "IT", 15.25, 17, 25));

@@ -36,6 +36,17 @@ SalariedStaff::SalariedStaff(std::string strFirstName, std::string strLastName, 
 	_boolIsSenior = boolIsSenior;
 }
 
+//nlohmann::json SalariedStaff::to_json() {
+//	nlohmann::json json;
+//	json["firstName"] = this->GetFirstName();
+//	json["lastName"] = this->GetLastName();
+//	json["jobRole"] = this->GetJobRole();
+//	json["department"] = this->GetDepartment();
+//	json["salary"] = this->GetSalary();
+//	json["isSenior"] = this->GetSenior();
+//	return json;
+//}
+
 ContractStaff::ContractStaff() : Staff() {
 	_dWage = 0;
 	_dWeeklyHours = 0;
@@ -47,6 +58,10 @@ ContractStaff::ContractStaff(std::string strFirstName, std::string strLastName, 
 	_dWeeklyHours = dWeeklyHours;
 	_iWeeks = iWeeks;
 }
+
+//nlohmann::json ContractStaff::to_json() {
+//
+//}
 
 double ContractStaff::GetContractCost() {
 	return (_dWage * _dWeeklyHours) * (double)_iWeeks;

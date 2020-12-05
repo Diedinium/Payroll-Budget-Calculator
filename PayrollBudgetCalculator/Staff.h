@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <nlohmann/json.hpp>
 
 #ifndef STAFF_H
 #define STAFF_H
@@ -43,6 +44,10 @@ public:
 
 	bool GetSenior() { return _boolIsSenior; }
 	void SetSenior(bool boolIsSenior) { _boolIsSenior = boolIsSenior; }
+
+	// Macro from nlohmann json library that defines a to and from json for SalariedStaff - avoids a lot of boilerplate.
+	// See: https://github.com/nlohmann/json#arbitrary-types-conversions
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(SalariedStaff, _strFirstName, _strLastName, _strJobRole, _strDepartment, _dSalary, _boolIsSenior)
 };
 
 class ContractStaff : public Staff {
@@ -65,6 +70,10 @@ public:
 	std::string GetWeeksFormatted() { return std::to_string(_iWeeks) + " weeks"; }
 	
 	double GetContractCost();
+
+	// Macro from nlohmann json library that defines a to and from json for ContractStaff - avoids a lot of boilerplate.
+	// See: https://github.com/nlohmann/json#arbitrary-types-conversions
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(ContractStaff, _strFirstName, _strLastName, _strJobRole, _strDepartment, _dWage, _dWeeklyHours, _iWeeks)
 };
 
 #endif // STAFF_H

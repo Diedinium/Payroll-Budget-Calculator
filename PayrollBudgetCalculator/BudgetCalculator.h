@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <nlohmann/json.hpp>
 #include "StaffManager.h"
 #include "Staff.h"
 
@@ -37,7 +38,9 @@ class BudgetCalculator {
 	double _dProjLenTotalPayroll;
 	double _dProjLenMinimumOverBudget;
 	double _dProjLenMaximumOverBudget;
+	void EvaluateProjectDuration();
 public:
+	BudgetCalculator();
 	BudgetCalculator(StaffManager* _ptrStaffmanager);
 	void Calculate();
 
@@ -72,5 +75,9 @@ public:
 	double GetProjLenTotalPayroll() { return _dProjLenTotalPayroll; }
 	double GetProjLenMinimumOverBudget() { return _dProjLenMinimumOverBudget; }
 	double GetProjLenMaximumOverBudget() { return _dProjLenMaximumOverBudget; }
+
+	// Macro from nlohmann json library that defines a to and from json for BudgetCalculator - avoids a lot of boilerplate.
+	// See: https://github.com/nlohmann/json#arbitrary-types-conversions
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(BudgetCalculator, _dMinBudgetOverPercent, _dMaxBudgetOverPercent, _dProjectLength)
 };
 #endif // !H_BUDGETCALCULATOR

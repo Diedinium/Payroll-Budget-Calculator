@@ -155,13 +155,15 @@ void SubMenuLoadProject::Execute() {
 
 void SubMenuSaveProject::Execute() {
 	std::cout << "Save project, placeholder menu.\n";
-	util::Pause();
 
-	std::vector<SalariedStaff> testVector;
+	SalariedStaff salariedStaffTest = *_ptrStaffManager->GetSalariedStaff("Jake Hall");
+	BudgetCalculator calculator = *_ptrFileManager->GetBudgetCalculatorPtr();
 
 	std::filesystem::path savePath = _ptrFileManager->GetSavesPath() /= L"TestJson.json";
 
-	json j;
+	nlohmann::json j;
+	nlohmann::json jTest = salariedStaffTest;
+	nlohmann::json jTest2 = calculator;
 
 	j.push_back({ 
 		{"test", 35},
@@ -173,15 +175,49 @@ void SubMenuSaveProject::Execute() {
 			{"more", "valueHere2"},
 			{"list", {4, 5, 6}}
 		});
+	j.push_back(jTest);
 
-	json j2;
+	nlohmann::json j2;
 
 	j2["testArray1"] = j;
 	j2["testArray2"] = j;
+	j2["testEmptyArray"] = nlohmann::json::array();
+	j2["testCalculator"] = jTest2;
 
 	std::ofstream ofStream(savePath);
 	ofStream << std::setw(4) << j2 << std::endl;
 	ofStream.close();
+
+	std::ifstream ifstream(savePath);
+	nlohmann::json jImport;
+	ifstream >> jImport;
+
+	std::cout << std::setw(4) << jImport << "\n\n";
+
+	std::cout << "testing iterating an array:\n\n";
+
+	for (auto& [key, value] : jImport.items())
+	{
+		std::cout << std::setw(4) << key << " : " << value << "\n";
+	}
+
+	std::cout << "\n\n";
+
+	for (auto& element : jImport["testArray1"])
+	{
+		std::cout << std::setw(4) << element << "\n";
+	}
+
+	std::cout << "\n\nTesting importing again:\n";
+
+	auto test = jImport["testArray1"][2].get<SalariedStaff>();
+	auto test2 = jImport.at("testCalculator").get<BudgetCalculator>();
+
+	std::cout << "Successfully imported: " << test.GetFullName() << "\n";
+
+	std::cout << "Imported calculator: " << test2.GetProjectLength() << "\n";
+
+	util::Pause();
 }
 
 void MenuViewStaff::Execute() {

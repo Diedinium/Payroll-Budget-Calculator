@@ -5,6 +5,15 @@ FileManager::FileManager() {
 	_vecPathsToVerify.push_back(std::filesystem::path(L"saves"));
 	_pathOutput = std::filesystem::path(L"output");
 	_pathSaves = std::filesystem::path(L"saves");
+	_ptrBudgetCalculator = NULL;
+}
+
+FileManager::FileManager(BudgetCalculator* budgetCalculator) {
+	_vecPathsToVerify.push_back(std::filesystem::path(L"output"));
+	_vecPathsToVerify.push_back(std::filesystem::path(L"saves"));
+	_pathOutput = std::filesystem::path(L"output");
+	_pathSaves = std::filesystem::path(L"saves");
+	_ptrBudgetCalculator = budgetCalculator;
 }
 
 void FileManager::EnsureDirectoriesExist() {
