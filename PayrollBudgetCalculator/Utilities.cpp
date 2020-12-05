@@ -17,6 +17,15 @@ void util::OutputSalariedStaffHeader() {
     std::cout << "-------------------------------------------------------------------------------------------------------------\n";
 }
 
+/// <summary>
+/// Outputs a header for a table displaying list of current files in the saves directory.
+/// </summary>
+void util::OutputFileListHeader() {
+	std::cout << "------------------------------------------------------------------------------------------------------\n";
+	std::cout << std::setw(4) << std::left << "Num" << std::setw(25) << std::left << "Date created" << std::setw(50) << std::left << "File name" << "\n";
+	std::cout << "------------------------------------------------------------------------------------------------------\n";
+}
+
 void util::OutputContractStaff(std::vector<ContractStaff>* ptrVecContractStaff) {
 	util::for_each_iterator(ptrVecContractStaff->begin(), ptrVecContractStaff->end(), 0, [](int index, ContractStaff& item) {
 		std::cout.precision(2);
@@ -47,6 +56,20 @@ void util::OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff) 
 }
 
 /// <summary>
+/// Outputs list of files that are in the passed Entries vector
+/// </summary>
+/// <param name="ptrVecEntries"></param>
+void util::OutputFileList(std::vector<std::filesystem::directory_entry>* ptrVecEntries) {
+	util::for_each_iterator(ptrVecEntries->begin(), ptrVecEntries->end(), 0, [](int index, std::filesystem::directory_entry& entry) {
+		std::cout.precision(2);
+		std::cout
+			<< std::fixed << std::left << std::setw(4) << index
+			<< std::setw(25) << ConvertFileTimeToString(entry.last_write_time())
+			<< std::setw(50) << entry.path().filename() << "\n";
+		});
+}
+
+/// <summary>
 /// Gets the current datetime in the time struct, which can then be output using std::put_time
 /// </summary>
 /// <returns>struct std::tm</returns>
@@ -56,4 +79,31 @@ std::tm util::GetCurrentDateTimeStruct() {
 	struct std::tm tm;
 	localtime_s(&tm, &date);
 	return tm;
+}
+
+/// <summary>
+/// Returns the current date and time in a file safe string format.
+/// </summary>
+/// <returns>std::string</returns>
+std::string util::GetCurrentDateTimeAsString() {
+	std::time_t date = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	struct std::tm tm;
+	localtime_s(&tm, &date);
+	std::stringstream ssBuffer;
+	ssBuffer << std::put_time(&tm, "%F_%I-%M-%S_%p");
+	return ssBuffer.str();
+}
+
+/// <summary>
+/// Takes fileTime and returns as string of ISO date and 12 hour time
+/// </summary>
+/// <param name="fileTime"></param>
+/// <returns></returns>
+std::string util::ConvertFileTimeToString(std::filesystem::file_time_type fileTime) {
+	std::time_t tt = to_time_t(fileTime);
+	std::tm time;
+	localtime_s(&time, &tt);
+	std::stringstream ssBuffer;
+	ssBuffer << std::put_time(&time, "%F %I:%M %p");
+	return ssBuffer.str();
 }

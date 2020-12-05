@@ -85,3 +85,8 @@ size_t StaffManager::CountStandardStaff() {
 size_t StaffManager::CountContractStaff() {
 	return _vecContractStaff.size();
 }
+
+void StaffManager::Reset() {
+	_vecSalariedStaff.clear();
+	_vecContractStaff.clear();
+}

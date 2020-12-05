@@ -3,9 +3,14 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <fstream>
+#include <nlohmann/json.hpp>
+#include <filesystem>
+#include <algorithm>
 #include "StaffManager.h"
 #include "InputValidator.h"
 #include "BudgetCalculator.h"
+#include "FileManager.h"
 
 #ifndef MENU_H
 #define MENU_H
@@ -39,8 +44,6 @@ public:
     void SetExitMenu(bool exitMenu) { _boolExitMenu = exitMenu; }
 };
 
-// Not worth putting these properties in the base abstract class, don't want to have to override them when creating each MenuItem.
-
 /// <summary>
 /// Each menu item will need a process to handle the output (ItemText), so a general menu item is created to implement this - most other menu items then inherit this class 
 /// and use it's base constructor.
@@ -71,14 +74,40 @@ public:
 
 class MenuCalculateBudget : public GeneralMenuItem {
     BudgetCalculator* _ptrBudgetCalculator;
+    FileManager* _ptrFileManager;
 public:
-    MenuCalculateBudget(std::string output, BudgetCalculator* budgetCalculator) : GeneralMenuItem(output, budgetCalculator->GetStaffManagerPtr()) { _ptrBudgetCalculator = budgetCalculator; }
+    MenuCalculateBudget(std::string output, BudgetCalculator* budgetCalculator, FileManager* fileManager);
     void Execute();
 };
 
-class MenuSaveLoad : public GeneralMenuItem {
+class MenuSaveLoadBase : public GeneralMenuItem {
+protected:
+    FileManager* _ptrFileManager;
 public:
-    MenuSaveLoad(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
+    MenuSaveLoadBase(std::string output, StaffManager* staffManager, FileManager* fileManager) : GeneralMenuItem(output, staffManager) { _ptrFileManager = fileManager; }
+};
+
+class MenuSaveLoad : public MenuSaveLoadBase {
+public:
+    MenuSaveLoad(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
+    void Execute();
+};
+
+class SubMenuLoadProject : public MenuSaveLoadBase {
+public:
+    SubMenuLoadProject(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
+    void Execute();
+};
+
+class SubMenuSaveProject : public MenuSaveLoadBase {
+public:
+    SubMenuSaveProject(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
+    void Execute();
+};
+
+class SubMenuClearSaves : public MenuSaveLoadBase {
+public:
+    SubMenuClearSaves(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
     void Execute();
 };
 
@@ -239,8 +268,9 @@ public:
 class SubMenuViewPayrollBudgetReport : public MenuCalculateBudgetBase {
     std::vector<SalariedStaff>* _ptrSalariedStaff;
     std::vector<ContractStaff>* _ptrContractStaff;
+    FileManager* _ptrFileManager;
 public:
-    SubMenuViewPayrollBudgetReport(std::string output, BudgetCalculator* budgetCalculator);
+    SubMenuViewPayrollBudgetReport(std::string output, BudgetCalculator* budgetCalculator, FileManager* fileManager);
     void Execute();
 };
 

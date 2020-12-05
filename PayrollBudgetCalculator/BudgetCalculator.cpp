@@ -1,5 +1,31 @@
 #include "BudgetCalculator.h"
 
+BudgetCalculator::BudgetCalculator() {
+	_ptrStaffManager = NULL;
+	_ptrVecSalariedStaff = NULL;
+	_ptrVecContractStaff = NULL;
+	_dMinBudgetOverPercent = 0;
+	_dMaxBudgetOverPercent = 0;
+	_dProjectLength = 0;
+	_dSeniorSalaryTotal = 0;
+	_dSeniorSalaryAverage = 0;
+	_dSalariedSalaryTotal = 0;
+	_dSalariedSalaryAverage = 0;
+	_dContractPayTotal = 0;
+	_dContractPayAverage = 0;
+	_dTotalPayroll = 0;
+	_dMinimumOverBudget = 0;
+	_dMaximumOverBudget = 0;
+
+	_boolProjectIsDefaultDuration = true;
+	_dProjLenSeniorSalaryTotal = 0;
+	_dProjLenSalariedSalaryTotal = 0;
+	_dProjLenContractPayTotal = 0;
+	_dProjLenTotalPayroll = 0;
+	_dProjLenMinimumOverBudget = 0;
+	_dProjLenMaximumOverBudget = 0;
+}
+
 BudgetCalculator::BudgetCalculator(StaffManager* staffManager) {
 	_ptrStaffManager = staffManager;
 	_ptrVecSalariedStaff = staffManager->GetPtrSalariedStaff();
@@ -24,6 +50,11 @@ BudgetCalculator::BudgetCalculator(StaffManager* staffManager) {
 	_dProjLenTotalPayroll = 0;
 	_dProjLenMinimumOverBudget = 0;
 	_dProjLenMaximumOverBudget = 0;
+}
+
+void BudgetCalculator::EvaluateProjectDuration() {
+	if (_dProjectLength != 1.0) _boolProjectIsDefaultDuration = false;
+	else _boolProjectIsDefaultDuration = true;
 }
 
 void BudgetCalculator::SetProjectLength(double projectLength) {
@@ -54,6 +85,7 @@ void BudgetCalculator::Calculate() {
 	_dMinimumOverBudget = _dTotalPayroll * ((_dMinBudgetOverPercent / 100.0) + 1.0);
 	_dMaximumOverBudget = _dTotalPayroll * ((_dMaxBudgetOverPercent / 100.0) + 1.0);
 
+	this->EvaluateProjectDuration();
 	if (!_boolProjectIsDefaultDuration) {
 		_dProjLenSeniorSalaryTotal = _dSeniorSalaryTotal * _dProjectLength;
 		_dProjLenSalariedSalaryTotal = _dSalariedSalaryTotal * _dProjectLength;
