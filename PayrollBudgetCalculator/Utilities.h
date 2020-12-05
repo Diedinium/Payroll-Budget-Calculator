@@ -61,7 +61,8 @@ namespace util {
 	void OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff);
 	void OutputFileList(std::vector<std::filesystem::directory_entry>* ptrVecEntries);
 	std::tm GetCurrentDateTimeStruct();
-	std::string convertFileTimeToString(std::filesystem::file_time_type fileTime);
+	std::string ConvertFileTimeToString(std::filesystem::file_time_type fileTime);
+	std::string GetCurrentDateTimeAsString();
 }
 
 #endif // !H_TEMPLATES

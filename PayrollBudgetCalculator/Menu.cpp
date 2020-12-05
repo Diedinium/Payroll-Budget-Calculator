@@ -90,6 +90,7 @@ void MenuSaveLoad::Execute() {
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return", &objMenuContainer)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuLoadProject("Load project", _ptrStaffManager, _ptrFileManager)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuSaveProject("Save current project", _ptrStaffManager, _ptrFileManager)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuClearSaves("Clear saves directory", _ptrStaffManager, _ptrFileManager)));
 
 	while (!objMenuContainer.GetExitMenu()) {
 		system("cls");
@@ -114,6 +115,7 @@ void SubMenuLoadProject::Execute() {
 		std::string strInput;
 
 		std::cout << "\nNOTE: Type esc to exit.\n";
+		std::cout << "NOTE: Importing will override your current project! Ensure you save first if you do not want to lose data.\n";
 
 		while (!util::find_substring_case_insensitive(strInput, std::string("esc"))) {
 			std::cout << "\nEnter number of project to import: ";
@@ -130,16 +132,40 @@ void SubMenuLoadProject::Execute() {
 					std::cout << "ERROR: Not a valid number, please try again: ";
 				}
 				else {
-					std::cout << "Reading " << vecEntries[iInput].path() << " ...\n";
+					std::filesystem::path pathToRead = vecEntries[iInput].path();
+					std::cout << "Importing " << pathToRead.filename() << " ...\n";
 
-					std::ifstream ifstrReadFile;
-					std::string line;
-					ifstrReadFile.open(vecEntries[iInput].path());
-					std::cout << "(Temporary) File contents:\n";
-					while (ifstrReadFile.good()) {
-						std::getline(ifstrReadFile, line);
-						std::cout << line << "\n";
+					std::ifstream ifReadFile(pathToRead);
+					nlohmann::json jsonImport;
+					ifReadFile >> jsonImport;
+					ifReadFile.close();
+
+					//std::cout << std::setw(4) << jsonImport << std::endl;
+					_ptrStaffManager->Reset();
+
+					if (jsonImport.contains("vecSalariedStaff")) {
+						for (auto& element : jsonImport["vecSalariedStaff"])
+						{
+							_ptrStaffManager->AddSalariedStaff(element.get<SalariedStaff>());
+						}
 					}
+					
+					if (jsonImport.contains("vecContractStaff")) {
+						for (auto& element : jsonImport["vecContractStaff"])
+						{
+							_ptrStaffManager->AddContractStaff(element.get<ContractStaff>());
+						}
+					}
+
+					if (jsonImport.contains("objBudgetCalculator")) {
+						BudgetCalculator objBudgetCalculatorImport = jsonImport["objBudgetCalculator"].get<BudgetCalculator>();
+						BudgetCalculator* ptrBudgetCalculator = _ptrFileManager->GetBudgetCalculatorPtr();
+						ptrBudgetCalculator->SetProjectLength(objBudgetCalculatorImport.GetProjectLength());
+						ptrBudgetCalculator->SetMinOverPercent(objBudgetCalculatorImport.GetMinOverPercent());
+						ptrBudgetCalculator->SetMaxOverPercent(objBudgetCalculatorImport.GetMaxOverPercent());
+					}
+
+					std::cout << "Project imported succesfully.\n\n";
 
 					strInput = "esc";
 
@@ -154,9 +180,61 @@ void SubMenuLoadProject::Execute() {
 }
 
 void SubMenuSaveProject::Execute() {
-	std::cout << "Save project, placeholder menu.\n";
+	system("cls");
+	std::cout << "Save project.\n";
+	std::cout << "NOTE: Please enter file name (max size 50 characters) or press enter to accept default file name. \n";
+	std::cout << "File name: ";
+	std::string fileName = InputValidator::ValidateString(50);
 
-	SalariedStaff salariedStaffTest = *_ptrStaffManager->GetSalariedStaff("Jake Hall");
+	if (fileName.length() < 1) {
+		fileName = "Export_" + util::GetCurrentDateTimeAsString() + ".json";
+	}
+	else {
+		fileName = fileName + ".json";
+	}
+
+	if (_ptrFileManager->CheckIfFileExistsInSaves(fileName)) {
+		std::cout << "ERROR: Could not save file as \"" << fileName << "\", this file already exists in the save directory;\n";
+		std::cout << "please try again with a different name, or alternatively, clear the save directory\n";
+		util::Pause();
+	}
+	else {
+		std::filesystem::path pathFileToWrite = _ptrFileManager->GetSavesPath() / fileName;
+
+		try {
+			std::ofstream ofStream(pathFileToWrite);
+			nlohmann::json jsonToSave;
+			nlohmann::json jsonVectorSalariedStaff = nlohmann::json::array();
+			nlohmann::json jsonVectorContractStaff = nlohmann::json::array();
+
+			std::vector<SalariedStaff>* vecPtrSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
+			std::vector<ContractStaff>* vecPtrContrctStaff = _ptrStaffManager->GetPtrContractStaff();
+
+			std::for_each(vecPtrSalariedStaff->begin(), vecPtrSalariedStaff->end(), [&jsonVectorSalariedStaff](SalariedStaff salariedStaff) {
+				jsonVectorSalariedStaff.push_back(salariedStaff);
+				});
+
+			std::for_each(vecPtrContrctStaff->begin(), vecPtrContrctStaff->end(), [&jsonVectorContractStaff](ContractStaff contractStaff) {
+				jsonVectorContractStaff.push_back(contractStaff);
+				});
+
+			jsonToSave["vecSalariedStaff"] = jsonVectorSalariedStaff;
+			jsonToSave["vecContractStaff"] = jsonVectorContractStaff;
+			jsonToSave["objBudgetCalculator"] = *_ptrFileManager->GetBudgetCalculatorPtr();
+
+			ofStream << std::setw(4) << jsonToSave << std::endl;
+			ofStream.close();
+
+			std::cout << "Project exported to file: " << pathFileToWrite << "\n";
+			util::Pause();
+		}
+		catch (std::exception ex) {
+			std::cout << "ERROR: " << ex.what() << "\n";
+			util::Pause();
+		}
+	}
+
+	/*SalariedStaff salariedStaffTest = *_ptrStaffManager->GetSalariedStaff("Jake Hall");
 	BudgetCalculator calculator = *_ptrFileManager->GetBudgetCalculatorPtr();
 
 	std::filesystem::path savePath = _ptrFileManager->GetSavesPath() /= L"TestJson.json";
@@ -165,7 +243,7 @@ void SubMenuSaveProject::Execute() {
 	nlohmann::json jTest = salariedStaffTest;
 	nlohmann::json jTest2 = calculator;
 
-	j.push_back({ 
+	j.push_back({
 		{"test", 35},
 		{"more", "valueHere"},
 		{"list", {1, 2, 3}}
@@ -217,7 +295,24 @@ void SubMenuSaveProject::Execute() {
 
 	std::cout << "Imported calculator: " << test2.GetProjectLength() << "\n";
 
-	util::Pause();
+	util::Pause();*/
+}
+
+void SubMenuClearSaves::Execute() {
+	system("cls");
+	std::cout << "Clearing saves directory..." << "\n";
+
+	std::vector<std::filesystem::directory_entry> vecEntries = _ptrFileManager->GetFilesFromSaveDirectory();
+
+	if (vecEntries.size() < 1) {
+		std::cout << "NOTE: Did not clear saves directory, there are curently no files in the save directory.\n";
+		util::Pause();
+	}
+	else {
+		int iResult = _ptrFileManager->ClearSavesDirectory() -1;
+		std::cout << "\nRemoved " << iResult << " files from saves directory\n\n";
+		util::Pause();
+	}
 }
 
 void MenuViewStaff::Execute() {

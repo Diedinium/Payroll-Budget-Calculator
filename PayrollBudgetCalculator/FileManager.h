@@ -22,5 +22,7 @@ public:
 	std::filesystem::path GetSavesPath() { return _pathSaves; }
 
 	BudgetCalculator* GetBudgetCalculatorPtr() { return _ptrBudgetCalculator; }
+	bool CheckIfFileExistsInSaves(std::string fileName);
+	int ClearSavesDirectory();
 };
 #endif // !H_FILEMANAGER

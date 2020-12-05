@@ -64,7 +64,7 @@ void util::OutputFileList(std::vector<std::filesystem::directory_entry>* ptrVecE
 		std::cout.precision(2);
 		std::cout
 			<< std::fixed << std::left << std::setw(4) << index
-			<< std::setw(25) << convertFileTimeToString(entry.last_write_time())
+			<< std::setw(25) << ConvertFileTimeToString(entry.last_write_time())
 			<< std::setw(50) << entry.path().filename() << "\n";
 		});
 }
@@ -82,11 +82,24 @@ std::tm util::GetCurrentDateTimeStruct() {
 }
 
 /// <summary>
+/// Returns the current date and time in a file safe string format.
+/// </summary>
+/// <returns>std::string</returns>
+std::string util::GetCurrentDateTimeAsString() {
+	std::time_t date = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	struct std::tm tm;
+	localtime_s(&tm, &date);
+	std::stringstream ssBuffer;
+	ssBuffer << std::put_time(&tm, "%F_%I-%M-%S_%p");
+	return ssBuffer.str();
+}
+
+/// <summary>
 /// Takes fileTime and returns as string of ISO date and 12 hour time
 /// </summary>
 /// <param name="fileTime"></param>
 /// <returns></returns>
-std::string util::convertFileTimeToString(std::filesystem::file_time_type fileTime) {
+std::string util::ConvertFileTimeToString(std::filesystem::file_time_type fileTime) {
 	std::time_t tt = to_time_t(fileTime);
 	std::tm time;
 	localtime_s(&time, &tt);

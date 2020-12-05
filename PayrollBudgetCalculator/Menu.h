@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <filesystem>
+#include <algorithm>
 #include "StaffManager.h"
 #include "InputValidator.h"
 #include "BudgetCalculator.h"
@@ -100,6 +102,12 @@ public:
 class SubMenuSaveProject : public MenuSaveLoadBase {
 public:
     SubMenuSaveProject(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
+    void Execute();
+};
+
+class SubMenuClearSaves : public MenuSaveLoadBase {
+public:
+    SubMenuClearSaves(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
     void Execute();
 };
 

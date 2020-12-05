@@ -32,3 +32,14 @@ std::vector<std::filesystem::directory_entry> FileManager::GetFilesFromSaveDirec
 	}
 	return vecEntries;
 }
+
+bool FileManager::CheckIfFileExistsInSaves(std::string fileName) {
+	std::filesystem::path pathToTest = _pathSaves / fileName;
+	return std::filesystem::exists(pathToTest);
+}
+
+int FileManager::ClearSavesDirectory() {
+	int iNumRemoved = (int)std::filesystem::remove_all(_pathSaves);
+	this->EnsureDirectoriesExist();
+	return iNumRemoved;
+}
