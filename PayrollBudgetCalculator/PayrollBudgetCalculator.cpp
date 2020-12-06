@@ -14,18 +14,24 @@ int main()
     FileManager fileManager = FileManager(&budgetCalculator);
     fileManager.EnsureDirectoriesExist();
 
-    staffManager.AddContractStaff(ContractStaff("Tobi", "Biddle", "Analyst", "IT", 15.25, 17, 25));
-    staffManager.AddContractStaff(ContractStaff("Test1", "Biddle", "Analyst", "IT", 15.25, 17, 25));
-    staffManager.AddContractStaff(ContractStaff("Test2", "Biddle", "Analyst", "IT", 15.25, 17, 25));
-    staffManager.AddContractStaff(ContractStaff("Test3", "Biddle", "Analyst", "IT", 15.25, 17, 25));
+    // NOTE TO TESTERS: Uncomment this code to quickly add an collection of staff if you don't want to waste lots of time adding staff members.
+    // Any references to famous characters are completely coincidental ;)
 
-    staffManager.AddSalariedStaff(SalariedStaff("Luke", "Boyle", "Junior Developer", "IT", 20252, false));
-    staffManager.AddSalariedStaff(SalariedStaff("Jake", "Hall", "Senior Developer", "IT", 35050, true));
-    staffManager.AddSalariedStaff(SalariedStaff("Tobi", "Hall", "Senior Developer", "IT", 35050, false));
-    staffManager.AddSalariedStaff(SalariedStaff("Jay", "Hall", "Senior Developer", "IT", 35050, true));
-    staffManager.AddSalariedStaff(SalariedStaff("Test4", "Hall", "Senior Developer", "IT", 52452.24, false));
-    staffManager.AddSalariedStaff(SalariedStaff("Jason", "Borne", "Senior Developer", "IT", 52452.24, true));
-    staffManager.AddSalariedStaff(SalariedStaff("Soylent", "Hall", "Senior Developer", "IT", 52452.24, true));
+    /*staffManager.AddContractStaff(ContractStaff("Obi-wan", "Kenobi", "Jedi Master", "Jedi Order", 28.50, 5, 29));
+    staffManager.AddContractStaff(ContractStaff("Anakin", "Skywalker", "Jedi Knight", "Jedi Order", 10.50, 10, 22));
+    staffManager.AddContractStaff(ContractStaff("Ben", "Kenobi", "Jedi Master", "Jedi Order", 23, 17, 5));
+    staffManager.AddContractStaff(ContractStaff("Jango", "Fett", "Bounty Hunter", "Himself", 18.25, 17, 15));
+    staffManager.AddContractStaff(ContractStaff("Boba", "Fett", "Bounty Hunter", "Himself", 25.25, 17, 30));
+
+    staffManager.AddSalariedStaff(SalariedStaff("Mace", "Windu", "Jedi Master", "Jedi Order", 20252, false));
+    staffManager.AddSalariedStaff(SalariedStaff("Ahsoka", "tano", "Jedi Knight", "Jedi Order", 42425.24, false));
+    staffManager.AddSalariedStaff(SalariedStaff("Viceroy", "Gunray", "Viceroy", "Trade Federation", 54000.25, false));
+    staffManager.AddSalariedStaff(SalariedStaff("Darth", "Maul", "Sith", "Sith Order", 35050, false));
+    staffManager.AddSalariedStaff(SalariedStaff("Darth", "Sidious", "Sith", "Sith Order", 52452.24, false));
+
+    staffManager.AddSalariedStaff(SalariedStaff("Jabba", "The Hut", "Crime lord", "Hutt gang", 89224.42, true));
+    staffManager.AddSalariedStaff(SalariedStaff("Luke", "Skywalker", "Jedi Knight", "Jedi Order", 80824.24, true));
+    staffManager.AddSalariedStaff(SalariedStaff("Leia", "Organa", "Princess", "Rebel Alliance", 252452, true));*/
 
     MenuContainer menuContainer = MenuContainer("Welcome to the payroll project budget calculator.\nPlease choose your option below.\n");
     menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Exit application", &menuContainer)));

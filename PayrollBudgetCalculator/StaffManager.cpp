@@ -1,5 +1,9 @@
 #include "StaffManager.h"
 
+/// <summary>
+/// Takes salaried staff member object and adds to vector within staff manager.
+/// </summary>
+/// <param name="objSalariedStaff"></param>
 void StaffManager::AddSalariedStaff(SalariedStaff objSalariedStaff) {
 	auto position = std::find_if(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&objSalariedStaff](SalariedStaff& obj) { return obj.GetFullName() == objSalariedStaff.GetFullName(); });
 
@@ -11,6 +15,10 @@ void StaffManager::AddSalariedStaff(SalariedStaff objSalariedStaff) {
 	}
 }
 
+/// <summary>
+/// Takes contract staff member object and adds to vector within staff manager.
+/// </summary>
+/// <param name="objContractStaff"></param>
 void StaffManager::AddContractStaff(ContractStaff objContractStaff) {
 	auto position = std::find_if(_vecContractStaff.begin(), _vecContractStaff.end(), [&objContractStaff](ContractStaff& obj) { return obj.GetFullName() == objContractStaff.GetFullName(); });
 
@@ -22,6 +30,12 @@ void StaffManager::AddContractStaff(ContractStaff objContractStaff) {
 	}
 }
 
+/// <summary>
+/// Takes full name and attempts to find and remove salaried staff member with this name.
+/// Note to self: This could be improved via polymorphism; a remove function that is generic to either staff member type could be made. SalariedStaff and ContractStaff can be cast to a pointer 
+/// of staff, allowing same remove function to remove either. Would require other changes as well though, such as storing all staff in same vector... maybe a change for another day.
+/// </summary>
+/// <param name="strFullName"></param>
 void StaffManager::RemoveSalariedStaff(std::string strFullName) {
 	auto position = std::find_if(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&strFullName](SalariedStaff& obj) { return obj.GetFullName() == strFullName; });
 
@@ -33,6 +47,10 @@ void StaffManager::RemoveSalariedStaff(std::string strFullName) {
 	}
 }
 
+/// <summary>
+/// Takes full name and tries to find and remove contract staff memember with this name
+/// </summary>
+/// <param name="strFullName"></param>
 void StaffManager::RemoveContractStaff(std::string strFullName) {
 	auto position = std::find_if(_vecContractStaff.begin(), _vecContractStaff.end(), [&strFullName](ContractStaff& obj) { return obj.GetFullName() == strFullName; });
 
@@ -44,6 +62,11 @@ void StaffManager::RemoveContractStaff(std::string strFullName) {
 	}
 }
 
+/// <summary>
+/// Returns pointer to salaried staff member, finds using full name.
+/// </summary>
+/// <param name="strFullName"></param>
+/// <returns></returns>
 SalariedStaff* StaffManager::GetSalariedStaff(std::string strFullname) {
 	auto position = std::find_if(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&strFullname](SalariedStaff& obj) { return obj.GetFullName() == strFullname; });
 
@@ -55,6 +78,11 @@ SalariedStaff* StaffManager::GetSalariedStaff(std::string strFullname) {
 	}
 }
 
+/// <summary>
+/// Returns pointer to contract staff member, finds using full name.
+/// </summary>
+/// <param name="strFullName"></param>
+/// <returns>ContractStaff*</returns>
 ContractStaff* StaffManager::GetContractStaff(std::string strFullname) {
 	auto position = std::find_if(_vecContractStaff.begin(), _vecContractStaff.end(), [&strFullname](ContractStaff& obj) { return obj.GetFullName() == strFullname; });
 
@@ -66,6 +94,10 @@ ContractStaff* StaffManager::GetContractStaff(std::string strFullname) {
 	}
 }
 
+/// <summary>
+/// Returns number of senior salaried staff currently in the staff manager.
+/// </summary>
+/// <returns>size_t</returns>
 size_t StaffManager::CountSeniorStaff() {
 	size_t count = 0;
 	std::for_each(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&count](SalariedStaff& item) {
@@ -74,6 +106,10 @@ size_t StaffManager::CountSeniorStaff() {
 	return count;
 }
 
+/// <summary>
+/// Returns number of standard salaried staff currently in the staff manager.
+/// </summary>
+/// <returns>size_t</returns>
 size_t StaffManager::CountStandardStaff() {
 	size_t count = 0;
 	std::for_each(_vecSalariedStaff.begin(), _vecSalariedStaff.end(), [&count](SalariedStaff& item) {
@@ -82,10 +118,17 @@ size_t StaffManager::CountStandardStaff() {
 	return count;
 }
 
+/// <summary>
+/// Returns the number of contract staff currently in the staff manager, implemeneted to avoid need to return pointer to contract staff vector just to get size.
+/// </summary>
+/// <returns></returns>
 size_t StaffManager::CountContractStaff() {
 	return _vecContractStaff.size();
 }
 
+/// <summary>
+/// Empties the vectors storing staff.
+/// </summary>
 void StaffManager::Reset() {
 	_vecSalariedStaff.clear();
 	_vecContractStaff.clear();

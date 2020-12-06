@@ -4,6 +4,9 @@
 #include "Utilities.h"
 #include "InputValidator.h"
 
+/// <summary>
+/// When a menu container is executed, iterates through it's menu items list and displays options - takes user choice and executes relevant menu item.
+/// </summary>
 void MenuContainer::Execute()
 {
 	std::cout << _strText << "\n";
@@ -20,16 +23,28 @@ void MenuContainer::Execute()
 	}
 };
 
+/// <summary>
+/// Adds a menu item to the list of menu items stored in a menu container.
+/// </summary>
+/// <param name="item"></param>
 void MenuContainer::AddMenuItem(std::unique_ptr<MenuItem> item) {
 	_vecMenuItems.push_back(std::move(item));
 };
 
+/// <summary>
+/// GeneralMenuItem contructor, stores menu text to output and pointer to the staff menu - inherited from and used as base contructor for most other menu classes.
+/// </summary>
+/// <param name="output"></param>
+/// <param name="staffManager"></param>
 GeneralMenuItem::GeneralMenuItem(std::string output, StaffManager* staffManager)
 {
 	_output = output;
 	_ptrStaffManager = staffManager;
 };
 
+/// <summary>
+/// Choice menu, allows user to select staff management option.
+/// </summary>
 void MenuStaffManagement::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("Staff management menu.\nChoose one of the below options.\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return to menu", &objMenuContainer)));
@@ -44,20 +59,37 @@ void MenuStaffManagement::Execute() {
 	}
 };
 
+/// <summary>
+/// MenuExit constructor, stores pointer to menu container upon initialisation.
+/// </summary>
+/// <param name="output"></param>
+/// <param name="menuContainer"></param>
 MenuExit::MenuExit(std::string output, MenuContainer* menuContainer) : GeneralMenuItem(output, NULL) {
 	_ptrMenuContainer = menuContainer;
 };
 
+/// <summary>
+/// Special menu option function - contains a pointer to the menu container object it is within, and sets the exit boolean to true, causing menu to exit on next loop.
+/// </summary>
 void MenuExit::Execute() {
 	_ptrMenuContainer->SetExitMenu(true);
 };
 
+/// <summary>
+/// MenuCalculateBudget constructor, stores pointer to budget calculator and file manager in class.
+/// </summary>
+/// <param name="output"></param>
+/// <param name="budgetCalculator"></param>
+/// <param name="fileManager"></param>
 MenuCalculateBudget::MenuCalculateBudget(std::string output, BudgetCalculator* budgetCalculator, FileManager* fileManager) : GeneralMenuItem(output, budgetCalculator->GetStaffManagerPtr())
 {
 	_ptrBudgetCalculator = budgetCalculator;
 	_ptrFileManager = fileManager;
 }
 
+/// <summary>
+/// Choice menu, allows user to select budget/calculation related option. Also displays warning if the recommended amount of staff are not in the system.
+/// </summary>
 void MenuCalculateBudget::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("\nChoose one of the below options.\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return to menu", &objMenuContainer)));
@@ -83,6 +115,9 @@ void MenuCalculateBudget::Execute() {
 	}
 };
 
+/// <summary>
+/// Choice menu, allows user to select project loading/saving related options.
+/// </summary>
 void MenuSaveLoad::Execute() {
 	system("cls");
 
@@ -98,6 +133,9 @@ void MenuSaveLoad::Execute() {
 	}
 };
 
+/// <summary>
+/// Allows user to load (import) a project file from the saves directory, lists and allows user to select using number (or they can canel by entering esc).
+/// </summary>
 void SubMenuLoadProject::Execute() {
 	system("cls");
 	std::cout << "Files in saved directory, please enter the number for the project you wish to import\n";
@@ -178,27 +216,30 @@ void SubMenuLoadProject::Execute() {
 	}
 }
 
+/// <summary>
+/// Allows user to save project to file, user can either accept default auto generated name or provide their own.
+/// </summary>
 void SubMenuSaveProject::Execute() {
 	system("cls");
 	std::cout << "Save project.\n";
 	std::cout << "NOTE: Please enter file name (max size 50 characters) or press enter to accept default file name. \n";
 	std::cout << "File name: ";
-	std::string fileName = InputValidator::ValidateString(50);
+	std::string strFileName = InputValidator::ValidateString(50);
 
-	if (fileName.length() < 1) {
-		fileName = "Export_" + util::GetCurrentDateTimeAsString() + ".json";
+	if (strFileName.length() < 1) {
+		strFileName = "Export_" + util::GetCurrentDateTimeAsString() + ".json";
 	}
 	else {
-		fileName = fileName + ".json";
+		strFileName = strFileName + ".json";
 	}
 
-	if (_ptrFileManager->CheckIfFileExistsInSaves(fileName)) {
-		std::cout << "ERROR: Could not save file as \"" << fileName << "\", this file already exists in the save directory;\n";
+	if (_ptrFileManager->CheckIfFileExistsInSaves(strFileName)) {
+		std::cout << "ERROR: Could not save file as \"" << strFileName << "\", this file already exists in the save directory;\n";
 		std::cout << "please try again with a different name, or alternatively, clear the save directory\n";
 		util::Pause();
 	}
 	else {
-		std::filesystem::path pathFileToWrite = _ptrFileManager->GetSavesPath() / fileName;
+		std::filesystem::path pathFileToWrite = _ptrFileManager->GetSavesPath() / strFileName;
 
 		try {
 			std::ofstream ofStream(pathFileToWrite);
@@ -206,14 +247,14 @@ void SubMenuSaveProject::Execute() {
 			nlohmann::json jsonVectorSalariedStaff = nlohmann::json::array();
 			nlohmann::json jsonVectorContractStaff = nlohmann::json::array();
 
-			std::vector<SalariedStaff>* vecPtrSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
-			std::vector<ContractStaff>* vecPtrContrctStaff = _ptrStaffManager->GetPtrContractStaff();
+			std::vector<SalariedStaff>* ptrVecSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
+			std::vector<ContractStaff>* ptrVecContrctStaff = _ptrStaffManager->GetPtrContractStaff();
 
-			std::for_each(vecPtrSalariedStaff->begin(), vecPtrSalariedStaff->end(), [&jsonVectorSalariedStaff](SalariedStaff salariedStaff) {
+			std::for_each(ptrVecSalariedStaff->begin(), ptrVecSalariedStaff->end(), [&jsonVectorSalariedStaff](SalariedStaff salariedStaff) {
 				jsonVectorSalariedStaff.push_back(salariedStaff);
 				});
 
-			std::for_each(vecPtrContrctStaff->begin(), vecPtrContrctStaff->end(), [&jsonVectorContractStaff](ContractStaff contractStaff) {
+			std::for_each(ptrVecContrctStaff->begin(), ptrVecContrctStaff->end(), [&jsonVectorContractStaff](ContractStaff contractStaff) {
 				jsonVectorContractStaff.push_back(contractStaff);
 				});
 
@@ -234,6 +275,9 @@ void SubMenuSaveProject::Execute() {
 	}
 }
 
+/// <summary>
+/// Clears the save directory (no user input required).
+/// </summary>
 void SubMenuClearSaves::Execute() {
 	system("cls");
 	std::cout << "Clearing saves directory..." << "\n";
@@ -251,6 +295,9 @@ void SubMenuClearSaves::Execute() {
 	}
 }
 
+/// <summary>
+/// Allows user to view current staff members, displays useful related options at end.
+/// </summary>
 void MenuViewStaff::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return to staff management menu", &objMenuContainer)));
@@ -306,6 +353,9 @@ void MenuViewStaff::Execute() {
 	}
 }
 
+/// <summary>
+/// Choice menu, allows user to choose staff type to add (separation needed due to different member properties).
+/// </summary>
 void SubMenuAddStaffMember::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("Choose Staff type to add.\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return to previous", &objMenuContainer)));
@@ -318,6 +368,9 @@ void SubMenuAddStaffMember::Execute() {
 	}
 };
 
+/// <summary>
+/// Allows user to add salaried staff members
+/// </summary>
 void SubMenuAddSalariedStaff::Execute() {
 	system("cls");
 	std::cout << "Add Salaried Staff\n";
@@ -356,6 +409,9 @@ void SubMenuAddSalariedStaff::Execute() {
 	}
 };
 
+/// <summary>
+/// Allows user to add contract staff members.
+/// </summary>
 void SubMenuAddContractStaff::Execute() {
 	system("cls");
 	std::cout << "Add Salaried Staff\n";
@@ -392,6 +448,9 @@ void SubMenuAddContractStaff::Execute() {
 	}
 };
 
+/// <summary>
+/// Choice menu, allows user to choose between removing salaried or contracted staff member
+/// </summary>
 void SubMenuRemoveStaffMember::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("Choose Staff type to add.\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return to previous", &objMenuContainer)));
@@ -404,6 +463,9 @@ void SubMenuRemoveStaffMember::Execute() {
 	}
 };
 
+/// <summary>
+/// Allows user to remove salaried staff member based on name, 0 allows user to exit.
+/// </summary>
 void SubMenuRemoveSalariedStaffMember::Execute() {
 	bool boolExitWhile = false;
 	do {
@@ -442,6 +504,9 @@ void SubMenuRemoveSalariedStaffMember::Execute() {
 	} while (!boolExitWhile);
 };
 
+/// <summary>
+/// Allows user to remove contract staff member based on name, 0 allows user to exit.
+/// </summary>
 void SubMenuRemoveContractStaff::Execute() {
 	bool boolExitWhile = false;
 	do {
@@ -480,6 +545,9 @@ void SubMenuRemoveContractStaff::Execute() {
 	} while (!boolExitWhile);
 };
 
+/// <summary>
+/// Choice menu, allows user to choose between updating salaried or contract staff (separation is needed due to different properties to update/change on each type).
+/// </summary>
 void MenuUpdateStaff::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("Choose Staff type to update.\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return to previous", &objMenuContainer)));
@@ -492,6 +560,9 @@ void MenuUpdateStaff::Execute() {
 	}
 }
 
+/// <summary>
+/// Displays update options when a salaried staff member is selected. Allows user to exit by entering 0.
+/// </summary>
 void SubMenuUpdateSalariedStaff::Execute() {
 	bool boolExitWhile = false;
 	do {
@@ -517,37 +588,40 @@ void SubMenuUpdateSalariedStaff::Execute() {
 			continue;
 		}
 
-		SalariedStaff* ptrSalariedStaff = _ptrStaffManager->GetSalariedStaff(strFullName);
+		SalariedStaff* ptrObjSalariedStaff = _ptrStaffManager->GetSalariedStaff(strFullName);
 
-		while (ptrSalariedStaff == NULL) {
+		while (ptrObjSalariedStaff == NULL) {
 			std::cout << "No staff member with this name found, please try again (enter 0 to cancel).\n";
 			std::cout << "Full name: ";
 			strFullName = InputValidator::ValidateString();
 			if (strFullName == "0") {
 				boolExitWhile = true;
-				ptrSalariedStaff = new SalariedStaff();
+				ptrObjSalariedStaff = new SalariedStaff();
 				continue;
 			}
-			ptrSalariedStaff = _ptrStaffManager->GetSalariedStaff(strFullName);
+			ptrObjSalariedStaff = _ptrStaffManager->GetSalariedStaff(strFullName);
 		}
 
 		MenuContainer objMenuContainer = MenuContainer("Choose action.\n");
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Cancel", &objMenuContainer)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffFirstName("Update first name", ptrSalariedStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffLastName("Update second name", ptrSalariedStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffJobRole("Update Job Title", ptrSalariedStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffDepartment("Update Department", ptrSalariedStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateSalariedSalary("Update Salary", ptrSalariedStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateSalariedSeniorStatus("Update Senior status", ptrSalariedStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffFirstName("Update first name", ptrObjSalariedStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffLastName("Update second name", ptrObjSalariedStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffJobRole("Update Job Title", ptrObjSalariedStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffDepartment("Update Department", ptrObjSalariedStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateSalariedSalary("Update Salary", ptrObjSalariedStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateSalariedSeniorStatus("Update Senior status", ptrObjSalariedStaff)));
 
 		while (!objMenuContainer.GetExitMenu()) {
 			system("cls");
-			std::cout << "\nUpdating: " << ptrSalariedStaff->GetFullName() << "\n";
+			std::cout << "\nUpdating: " << ptrObjSalariedStaff->GetFullName() << "\n";
 			objMenuContainer.Execute();
 		}
 	} while (!boolExitWhile);
 }
 
+/// <summary>
+/// Displays update options when a contracted staff member is selected. Allows user to exit by entering 0.
+/// </summary>
 void SubMenuUpdateContractStaff::Execute() {
 	bool boolExitWhile = false;
 	do {
@@ -574,38 +648,41 @@ void SubMenuUpdateContractStaff::Execute() {
 			continue;
 		}
 
-		ContractStaff* ptrContractStaff = _ptrStaffManager->GetContractStaff(strFullName);
+		ContractStaff* ptrObjContractStaff = _ptrStaffManager->GetContractStaff(strFullName);
 
-		while (ptrContractStaff == NULL) {
+		while (ptrObjContractStaff == NULL) {
 			std::cout << "No staff member with this name found, please try again (enter 0 to cancel).\n";
 			std::cout << "Full name: ";
 			strFullName = InputValidator::ValidateString();
 			if (strFullName == "0") {
 				boolExitWhile = true;
-				ptrContractStaff = new ContractStaff();
+				ptrObjContractStaff = new ContractStaff();
 				continue;
 			}
-			ptrContractStaff = _ptrStaffManager->GetContractStaff(strFullName);
+			ptrObjContractStaff = _ptrStaffManager->GetContractStaff(strFullName);
 		}
 
 		MenuContainer objMenuContainer = MenuContainer("Choose action.\n");
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Cancel", &objMenuContainer)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffFirstName("Update first name", ptrContractStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffLastName("Update second name", ptrContractStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffJobRole("Update Job Title", ptrContractStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffDepartment("Update Department", ptrContractStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateContractWage("Update Wage", ptrContractStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateContractHours("Update contracted hours", ptrContractStaff)));
-		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateContractWeeks("Update contracted weeks", ptrContractStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffFirstName("Update first name", ptrObjContractStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffLastName("Update second name", ptrObjContractStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffJobRole("Update Job Title", ptrObjContractStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffDepartment("Update Department", ptrObjContractStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateContractWage("Update Wage", ptrObjContractStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateContractHours("Update contracted hours", ptrObjContractStaff)));
+		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateContractWeeks("Update contracted weeks", ptrObjContractStaff)));
 
 		while (!objMenuContainer.GetExitMenu()) {
 			system("cls");
-			std::cout << "\nUpdating: " << ptrContractStaff->GetFullName() << "\n";
+			std::cout << "\nUpdating: " << ptrObjContractStaff->GetFullName() << "\n";
 			objMenuContainer.Execute();
 		}
 	} while (!boolExitWhile);
 }
 
+/// <summary>
+/// Allows user to update staff member first name (both salaried and contract staff)
+/// </summary>
 void ActionMenuUpdateStaffFirstName::Execute() {
 	std::cout << "\nEnter new first name: ";
 	std::string strFirstName = InputValidator::ValidateString(15);
@@ -615,6 +692,9 @@ void ActionMenuUpdateStaffFirstName::Execute() {
 	util::Pause();
 }
 
+/// <summary>
+/// Allows user to update staff member last name (both salaried and contract staff)
+/// </summary>
 void ActionMenuUpdateStaffLastName::Execute() {
 	std::cout << "\nEnter new last name: ";
 	std::string strLastName = InputValidator::ValidateString(15);
@@ -624,6 +704,9 @@ void ActionMenuUpdateStaffLastName::Execute() {
 	util::Pause();
 }
 
+/// <summary>
+/// Allows user to update staff member job role (both salaried and contract staff)
+/// </summary>
 void ActionMenuUpdateStaffJobRole::Execute() {
 	std::cout << "\nEnter new job role: ";
 	std::string strJobRole = InputValidator::ValidateString(20);
@@ -633,6 +716,9 @@ void ActionMenuUpdateStaffJobRole::Execute() {
 	util::Pause();
 }
 
+/// <summary>
+/// Allows user to update staff member department (both salaried and contract staff)
+/// </summary>
 void ActionMenuUpdateStaffDepartment::Execute() {
 	std::cout << "\nEnter new department: ";
 	std::string strDepartment = InputValidator::ValidateString(25);
@@ -642,6 +728,9 @@ void ActionMenuUpdateStaffDepartment::Execute() {
 	util::Pause();
 }
 
+/// <summary>
+/// Allows user to update salaried staff salary.
+/// </summary>
 void ActionMenuUpdateSalariedSalary::Execute() {
 	std::cout << "\nEnter new salary: ";
 	double dSalary = InputValidator::ValidateDouble();
@@ -651,6 +740,9 @@ void ActionMenuUpdateSalariedSalary::Execute() {
 	util::Pause();
 }
 
+/// <summary>
+/// Allows user to update salaried staff senior status (true/false)
+/// </summary>
 void ActionMenuUpdateSalariedSeniorStatus::Execute() {
 	std::cout << "\nEnter new senior status (true or false): ";
 	std::string strSeniorStatus = InputValidator::ValidateString(5);
@@ -678,6 +770,9 @@ void ActionMenuUpdateSalariedSeniorStatus::Execute() {
 	}
 }
 
+/// <summary>
+/// Allows user to update contracted wage for contract staff.
+/// </summary>
 void ActionMenuUpdateContractWage::Execute() {
 	std::cout << "\nEnter new wage: ";
 	double dWage = InputValidator::ValidateDouble();
@@ -687,6 +782,9 @@ void ActionMenuUpdateContractWage::Execute() {
 	util::Pause();
 }
 
+/// <summary>
+/// Allows user to update contracted weekly hours for contracted staff.
+/// </summary>
 void ActionMenuUpdateContractHours::Execute() {
 	std::cout << "\nEnter new weekly hours (max 20): ";
 	double dWeeklyHours = InputValidator::ValidateDouble(20);
@@ -696,6 +794,9 @@ void ActionMenuUpdateContractHours::Execute() {
 	util::Pause();
 }
 
+/// <summary>
+/// Allows user to update contracted weeks for Contract staff.
+/// </summary>
 void ActionMenuUpdateContractWeeks::Execute() {
 	std::cout << "\nEnter new contracted weeks (max 30): ";
 	int dContractedWeeks = InputValidator::ValidateInt(30);
@@ -705,6 +806,12 @@ void ActionMenuUpdateContractWeeks::Execute() {
 	util::Pause();
 }
 
+/// <summary>
+/// SubMenuViewPayrollBudgetReport constructor, gets pointers to vectors and stores in private members in the class
+/// </summary>
+/// <param name="output"></param>
+/// <param name="budgetCalculator"></param>
+/// <param name="fileManager"></param>
 SubMenuViewPayrollBudgetReport::SubMenuViewPayrollBudgetReport(std::string output, BudgetCalculator* budgetCalculator, FileManager* fileManager) : MenuCalculateBudgetBase(output, budgetCalculator)
 {
 	_ptrSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
@@ -712,6 +819,9 @@ SubMenuViewPayrollBudgetReport::SubMenuViewPayrollBudgetReport(std::string outpu
 	_ptrFileManager = fileManager;
 }
 
+/// <summary>
+/// Displays payroll budget report to console, displays convienient options to user afterwards, such as allowing exporting the report to file.
+/// </summary>
 void SubMenuViewPayrollBudgetReport::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("Choose action.\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return", &objMenuContainer)));
@@ -800,6 +910,9 @@ void SubMenuViewPayrollBudgetReport::Execute() {
 	}
 }
 
+/// <summary>
+/// Allows user to set the minimum budget overrun percentage.
+/// </summary>
 void SubMenuUpdateMinOverrun::Execute() {
 	system("cls");
 	std::cout << "Update minimum budget overrun percentage (0-100, must be less than current maximum budget overrun)\n";
@@ -816,6 +929,9 @@ void SubMenuUpdateMinOverrun::Execute() {
 	}
 }
 
+/// <summary>
+/// Allows user to set the maximum budget overrun percentage.
+/// </summary>
 void SubMenuUpdateMaxOverrun::Execute() {
 	system("cls");
 	std::cout << "Update maxiumum budget overrun percentage (0-100, must be more than current minimum budget overrun)\n";
@@ -832,6 +948,9 @@ void SubMenuUpdateMaxOverrun::Execute() {
 	}
 }
 
+/// <summary>
+/// Allows user to enter new project length
+/// </summary>
 void SubMenuUpdateProjectLength::Execute() {
 	system("cls");
 	std::cout << "Update project length (in years, e.g. 1 for one year, 1.5 for one year and a half)\n";
@@ -865,29 +984,29 @@ void SubMenuSaveReportText::Execute() {
 	std::cout << "Save report to text file.\n";
 	std::cout << "NOTE: Please enter file name for report (max size 50 characters) or press enter to accept default file name. \n";
 	std::cout << "File name: ";
-	std::string fileName = InputValidator::ValidateString(50);
+	std::string strFileName = InputValidator::ValidateString(50);
 
-	if (fileName.length() < 1) {
-		fileName = "Report_" + util::GetCurrentDateTimeAsString() + ".txt";
+	if (strFileName.length() < 1) {
+		strFileName = "Report_" + util::GetCurrentDateTimeAsString() + ".txt";
 	}
 	else {
-		fileName = fileName + ".json";
+		strFileName = strFileName + ".json";
 	}
 
-	if (_ptrFileManager->CheckIfFileExistsInOutput(fileName)) {
-		std::cout << "ERROR: Could not save file as \"" << fileName << "\", this file already exists in the output directory;\n";
+	if (_ptrFileManager->CheckIfFileExistsInOutput(strFileName)) {
+		std::cout << "ERROR: Could not save file as \"" << strFileName << "\", this file already exists in the output directory;\n";
 		std::cout << "please try again with a different name, or alternatively, clear the save directory\n";
 		util::Pause();
 	}
 	else {
-		std::filesystem::path pathFileToWrite = _ptrFileManager->GetOutputPath() / fileName;
+		std::filesystem::path pathFileToWrite = _ptrFileManager->GetOutputPath() / strFileName;
 
 		try {
 			struct std::tm timeNow = util::GetCurrentDateTimeStruct();
-			std::vector<SalariedStaff>* _ptrSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
-			std::vector<ContractStaff>* _ptrContractStaff = _ptrStaffManager->GetPtrContractStaff();
-			BudgetCalculator* ptrBudgetCalculator = _ptrFileManager->GetBudgetCalculatorPtr();
-			ptrBudgetCalculator->Calculate();
+			std::vector<SalariedStaff>* ptrVecSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
+			std::vector<ContractStaff>* ptrVecContractStaff = _ptrStaffManager->GetPtrContractStaff();
+			BudgetCalculator* ptrObjBudgetCalculator = _ptrFileManager->GetBudgetCalculatorPtr();
+			ptrObjBudgetCalculator->Calculate();
 			std::ofstream ofStream(pathFileToWrite);
 			
 			ofStream.imbue(std::locale("en_GB"));
@@ -896,7 +1015,7 @@ void SubMenuSaveReportText::Execute() {
 			if (_ptrStaffManager->CountSeniorStaff() > 0) {
 				ofStream << "Number of senior staff assigned to project: " << _ptrStaffManager->CountSeniorStaff() << "\n";
 				ofStream << "Names: ";
-				std::for_each(_ptrSalariedStaff->begin(), _ptrSalariedStaff->end(), [&ofStream](SalariedStaff salariedStaff) {
+				std::for_each(ptrVecSalariedStaff->begin(), ptrVecSalariedStaff->end(), [&ofStream](SalariedStaff salariedStaff) {
 					if (salariedStaff.GetSenior()) ofStream << salariedStaff.GetFullName() << ", ";
 					});
 				ofStream << "\n\n";
@@ -908,7 +1027,7 @@ void SubMenuSaveReportText::Execute() {
 			if (_ptrStaffManager->CountStandardStaff() > 0) {
 				ofStream << "Number of salaried staff assigned to project: " << _ptrStaffManager->CountStandardStaff() << "\n";
 				ofStream << "Names: ";
-				std::for_each(_ptrSalariedStaff->begin(), _ptrSalariedStaff->end(), [&ofStream](SalariedStaff salariedStaff) {
+				std::for_each(ptrVecSalariedStaff->begin(), ptrVecSalariedStaff->end(), [&ofStream](SalariedStaff salariedStaff) {
 					if (!salariedStaff.GetSenior()) ofStream << salariedStaff.GetFullName() << ", ";
 					});
 				ofStream << "\n\n";
@@ -920,7 +1039,7 @@ void SubMenuSaveReportText::Execute() {
 			if (_ptrStaffManager->CountContractStaff() > 0) {
 				ofStream << "Number of contract staff assigned to project: " << _ptrStaffManager->CountContractStaff() << "\n";
 				ofStream << "Names: ";
-				std::for_each(_ptrContractStaff->begin(), _ptrContractStaff->end(), [&ofStream](Staff contractStaff) {
+				std::for_each(ptrVecContractStaff->begin(), ptrVecContractStaff->end(), [&ofStream](Staff contractStaff) {
 					ofStream << contractStaff.GetFullName() << ", ";
 					});
 				ofStream << "\n\n";
@@ -929,28 +1048,28 @@ void SubMenuSaveReportText::Execute() {
 				ofStream << "No contract staff added for this project.\n\n";
 			}
 
-			ptrBudgetCalculator->Calculate();
+			ptrObjBudgetCalculator->Calculate();
 
 			ofStream.precision(2);
 			ofStream << std::fixed << "--- Costs per year ---\n\n";
-			ofStream << "Senior staff total salary: " << ptrBudgetCalculator->GetSeniorSalaryTotal() << "\n";
-			ofStream << "Senior staff average salary: " << ptrBudgetCalculator->GetSeniorSalaryAverage() << "\n\n";
-			ofStream << "Salaried staff total salary: " << ptrBudgetCalculator->GetSalariedSalaryTotal() << "\n";
-			ofStream << "Salaried staff average salary: " << ptrBudgetCalculator->GetSalariedSalaryAverage() << "\n\n";
-			ofStream << "Contractor total costs: " << ptrBudgetCalculator->GetContractorCostTotal() << "\n";
-			ofStream << "Contractor average costs: " << ptrBudgetCalculator->GetContractorCostAverage() << "\n\n";
-			ofStream << "Total payroll cost: " << ptrBudgetCalculator->GetTotalPayroll() << "\n";
-			ofStream << "Total payroll cost (with overrun): (Min - " << ptrBudgetCalculator->GetMinOverPercent() << "%) " << ptrBudgetCalculator->GetMinimumOverBudget() << " - "
-				<< "(Max - " << ptrBudgetCalculator->GetMaxOverPercent() << "%) " << ptrBudgetCalculator->GetMaximumOverBudget() << "\n\n";
+			ofStream << "Senior staff total salary: " << ptrObjBudgetCalculator->GetSeniorSalaryTotal() << "\n";
+			ofStream << "Senior staff average salary: " << ptrObjBudgetCalculator->GetSeniorSalaryAverage() << "\n\n";
+			ofStream << "Salaried staff total salary: " << ptrObjBudgetCalculator->GetSalariedSalaryTotal() << "\n";
+			ofStream << "Salaried staff average salary: " << ptrObjBudgetCalculator->GetSalariedSalaryAverage() << "\n\n";
+			ofStream << "Contractor total costs: " << ptrObjBudgetCalculator->GetContractorCostTotal() << "\n";
+			ofStream << "Contractor average costs: " << ptrObjBudgetCalculator->GetContractorCostAverage() << "\n\n";
+			ofStream << "Total payroll cost: " << ptrObjBudgetCalculator->GetTotalPayroll() << "\n";
+			ofStream << "Total payroll cost (with overrun): (Min - " << ptrObjBudgetCalculator->GetMinOverPercent() << "%) " << ptrObjBudgetCalculator->GetMinimumOverBudget() << " - "
+				<< "(Max - " << ptrObjBudgetCalculator->GetMaxOverPercent() << "%) " << ptrObjBudgetCalculator->GetMaximumOverBudget() << "\n\n";
 
-			if (!ptrBudgetCalculator->GetProjectIsDefaultDuration()) {
-				ofStream << "--- Costs over tatal project length of " << ptrBudgetCalculator->GetProjectLength() << " years " << "---\n\n";
-				ofStream << "Senior staff total salary: " << ptrBudgetCalculator->GetProjLenSeniorSalaryTotal() << "\n";
-				ofStream << "Salaried staff total salary: " << ptrBudgetCalculator->GetProjLenSalariedSalaryTotal() << "\n";
-				ofStream << "Contractor total costs: " << ptrBudgetCalculator->GetProjLenContractPayTotal() << "\n";
-				ofStream << "Total payroll cost: " << ptrBudgetCalculator->GetProjLenTotalPayroll() << "\n";
-				ofStream << "Total payroll cost (with overrun): (Min - " << ptrBudgetCalculator->GetMinOverPercent() << "%) " << ptrBudgetCalculator->GetProjLenMinimumOverBudget() << " - "
-					<< "(Max - " << ptrBudgetCalculator->GetMaxOverPercent() << "%) " << ptrBudgetCalculator->GetProjLenMaximumOverBudget() << "\n\n";
+			if (!ptrObjBudgetCalculator->GetProjectIsDefaultDuration()) {
+				ofStream << "--- Costs over tatal project length of " << ptrObjBudgetCalculator->GetProjectLength() << " years " << "---\n\n";
+				ofStream << "Senior staff total salary: " << ptrObjBudgetCalculator->GetProjLenSeniorSalaryTotal() << "\n";
+				ofStream << "Salaried staff total salary: " << ptrObjBudgetCalculator->GetProjLenSalariedSalaryTotal() << "\n";
+				ofStream << "Contractor total costs: " << ptrObjBudgetCalculator->GetProjLenContractPayTotal() << "\n";
+				ofStream << "Total payroll cost: " << ptrObjBudgetCalculator->GetProjLenTotalPayroll() << "\n";
+				ofStream << "Total payroll cost (with overrun): (Min - " << ptrObjBudgetCalculator->GetMinOverPercent() << "%) " << ptrObjBudgetCalculator->GetProjLenMinimumOverBudget() << " - "
+					<< "(Max - " << ptrObjBudgetCalculator->GetMaxOverPercent() << "%) " << ptrObjBudgetCalculator->GetProjLenMaximumOverBudget() << "\n\n";
 			}
 
 			ofStream.close();
@@ -973,26 +1092,26 @@ void SubMenuSaveReportJson::Execute() {
 	std::cout << "Save report to json file.\n";
 	std::cout << "NOTE: Please enter file name for report (max size 50 characters) or press enter to accept default file name. \n";
 	std::cout << "File name: ";
-	std::string fileName = InputValidator::ValidateString(50);
+	std::string strFileName = InputValidator::ValidateString(50);
 
-	if (fileName.length() < 1) {
-		fileName = "Report_" + util::GetCurrentDateTimeAsString() + ".json";
+	if (strFileName.length() < 1) {
+		strFileName = "Report_" + util::GetCurrentDateTimeAsString() + ".json";
 	}
 	else {
-		fileName = fileName + ".json";
+		strFileName = strFileName + ".json";
 	}
 
-	if (_ptrFileManager->CheckIfFileExistsInOutput(fileName)) {
-		std::cout << "ERROR: Could not save file as \"" << fileName << "\", this file already exists in the output directory;\n";
+	if (_ptrFileManager->CheckIfFileExistsInOutput(strFileName)) {
+		std::cout << "ERROR: Could not save file as \"" << strFileName << "\", this file already exists in the output directory;\n";
 		std::cout << "please try again with a different name, or alternatively, clear the save directory\n";
 		util::Pause();
 	}
 	else {
-		std::filesystem::path pathFileToWrite = _ptrFileManager->GetOutputPath() / fileName;
+		std::filesystem::path pathFileToWrite = _ptrFileManager->GetOutputPath() / strFileName;
 
 		try {
-			BudgetCalculator* ptrBudgetCalculator = _ptrFileManager->GetBudgetCalculatorPtr();
-			ptrBudgetCalculator->Calculate();
+			BudgetCalculator* ptrObjBudgetCalculator = _ptrFileManager->GetBudgetCalculatorPtr();
+			ptrObjBudgetCalculator->Calculate();
 			std::ofstream ofStream(pathFileToWrite);
 			nlohmann::json jsonToSave;
 			nlohmann::json jsonVectorSalariedStaff = nlohmann::json::array();
@@ -1013,27 +1132,27 @@ void SubMenuSaveReportJson::Execute() {
 			jsonToSave["vecContractStaff"] = jsonVectorContractStaff;
 			jsonToSave["objBudgetCalculator"] = *_ptrFileManager->GetBudgetCalculatorPtr();
 			jsonToSave["calculatedCosts1year"] = {
-				{"SeniorSalaryTotal", ptrBudgetCalculator->GetSeniorSalaryTotal()},
-				{"SeniorSalaryAverage", ptrBudgetCalculator->GetSeniorSalaryAverage()},
-				{"SalariedSalaryTotal", ptrBudgetCalculator->GetSalariedSalaryTotal()},
-				{"SalariedSalaryAverage", ptrBudgetCalculator->GetSalariedSalaryAverage()},
-				{"ContractPayTotal", ptrBudgetCalculator->GetContractorCostTotal()},
-				{"ContractPayAverage", ptrBudgetCalculator->GetContractorCostAverage()},
-				{"TotalPayroll", ptrBudgetCalculator->GetTotalPayroll()},
-				{"MinimumOverBudget", ptrBudgetCalculator->GetMinimumOverBudget()},
-				{"MaximumOverBudget", ptrBudgetCalculator->GetMaximumOverBudget()}
+				{"SeniorSalaryTotal", ptrObjBudgetCalculator->GetSeniorSalaryTotal()},
+				{"SeniorSalaryAverage", ptrObjBudgetCalculator->GetSeniorSalaryAverage()},
+				{"SalariedSalaryTotal", ptrObjBudgetCalculator->GetSalariedSalaryTotal()},
+				{"SalariedSalaryAverage", ptrObjBudgetCalculator->GetSalariedSalaryAverage()},
+				{"ContractPayTotal", ptrObjBudgetCalculator->GetContractorCostTotal()},
+				{"ContractPayAverage", ptrObjBudgetCalculator->GetContractorCostAverage()},
+				{"TotalPayroll", ptrObjBudgetCalculator->GetTotalPayroll()},
+				{"MinimumOverBudget", ptrObjBudgetCalculator->GetMinimumOverBudget()},
+				{"MaximumOverBudget", ptrObjBudgetCalculator->GetMaximumOverBudget()}
 			};
 
-			if (!ptrBudgetCalculator->GetProjectIsDefaultDuration()) {
+			if (!ptrObjBudgetCalculator->GetProjectIsDefaultDuration()) {
 				std::stringstream ssBuffer;
-				ssBuffer << std::setprecision(2) << "calculatedCosts" << ptrBudgetCalculator->GetProjectLength() << "year";
+				ssBuffer << std::setprecision(2) << "calculatedCosts" << ptrObjBudgetCalculator->GetProjectLength() << "year";
 				jsonToSave[ssBuffer.str()] = {
-					{"SeniorSalaryTotal", ptrBudgetCalculator->GetProjLenSeniorSalaryTotal()},
-					{"SalariedSalaryTotal", ptrBudgetCalculator->GetProjLenSalariedSalaryTotal()},
-					{"ContractPayTotal", ptrBudgetCalculator->GetProjLenContractPayTotal()},
-					{"TotalPayroll", ptrBudgetCalculator->GetProjLenTotalPayroll()},
-					{"MinimumOverBudget", ptrBudgetCalculator->GetProjLenMinimumOverBudget()},
-					{"MaximumOverBudget", ptrBudgetCalculator->GetProjLenMaximumOverBudget()}
+					{"SeniorSalaryTotal", ptrObjBudgetCalculator->GetProjLenSeniorSalaryTotal()},
+					{"SalariedSalaryTotal", ptrObjBudgetCalculator->GetProjLenSalariedSalaryTotal()},
+					{"ContractPayTotal", ptrObjBudgetCalculator->GetProjLenContractPayTotal()},
+					{"TotalPayroll", ptrObjBudgetCalculator->GetProjLenTotalPayroll()},
+					{"MinimumOverBudget", ptrObjBudgetCalculator->GetProjLenMinimumOverBudget()},
+					{"MaximumOverBudget", ptrObjBudgetCalculator->GetProjLenMaximumOverBudget()}
 				};
 			}
 

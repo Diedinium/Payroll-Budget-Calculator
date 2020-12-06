@@ -38,10 +38,26 @@ class BudgetCalculator {
 	double _dProjLenTotalPayroll;
 	double _dProjLenMinimumOverBudget;
 	double _dProjLenMaximumOverBudget;
+
+	/// <summary>
+	/// When called, updates the projectIsDefaultDuration member to true or false based on if the project length is or is not 1 year long.
+	/// </summary>
 	void EvaluateProjectDuration();
 public:
+	/// <summary>
+	/// BudgetCalculator default constructor, initialises values. Needed to allow JSON to/from serialisation to work.
+	/// </summary>
 	BudgetCalculator();
+
+	/// <summary>
+	/// BudgetCalculator parameter constructor, initialises with default values and stores pointer to staff manager
+	/// </summary>
+	/// <param name="staffManager"></param>
 	BudgetCalculator(StaffManager* _ptrStaffmanager);
+
+	/// <summary>
+	/// Performs the necessary calculations to populate values for the payroll budget reports.
+	/// </summary>
 	void Calculate();
 
 	double GetMinOverPercent() { return _dMinBudgetOverPercent; }
@@ -51,6 +67,11 @@ public:
 	void SetMaxOverPercent(double maxOverPercent) { _dMaxBudgetOverPercent = maxOverPercent; }
 
 	double GetProjectLength() { return _dProjectLength; }
+
+	/// <summary>
+	/// Used to set the project length, re-evaluates the project default duration once set.
+	/// </summary>
+	/// <param name="projectLength"></param>
 	void SetProjectLength(double projectLength);
 
 	StaffManager* GetStaffManagerPtr() { return _ptrStaffManager; }

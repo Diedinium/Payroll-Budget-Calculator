@@ -1,16 +1,25 @@
 #include "Utilities.h"
 
+/// <summary>
+/// Waits for user input in order to continue, used to "pause" console when needed.
+/// </summary>
 void util::Pause() {
     std::cout << "Press any key to continue...\n";
     auto value = _getch();
 }
 
+/// <summary>
+/// Outputs table format header for contract staff members.
+/// </summary>
 void util::OutputContractStaffHeader() {
     std::cout << "-------------------------------------------------------------------------------------------------------------\n";
     std::cout << std::setw(4) << std::left << "Num" << std::setw(15) << std::left << "First Name" << std::setw(15) << std::left << "Last Name" << std::setw(25) << std::left << "Job Role" << std::setw(20) << std::left << "Department" << std::setw(8) << std::left << "Wage" << std::setw(12) << std::left << "Hours p/w" << std::setw(10) << std::left << "Contracted" << "\n";
     std::cout << "-------------------------------------------------------------------------------------------------------------\n";
 }
 
+/// <summary>
+/// Outputs table format header for salaried staff members
+/// </summary>
 void util::OutputSalariedStaffHeader() {
     std::cout << "-------------------------------------------------------------------------------------------------------------\n";
     std::cout << std::setw(4) << std::left << "Num" << std::setw(15) << std::left << "First Name" << std::setw(15) << std::left << "Last Name" << std::setw(25) << "Job Role" << std::setw(20) << "Department" << std::setw(12) << "Salary" << std::setw(5) << "Senior?" << "\n";
@@ -26,6 +35,10 @@ void util::OutputFileListHeader() {
 	std::cout << "------------------------------------------------------------------------------------------------------\n";
 }
 
+/// <summary>
+/// Outputs table format list of contract staff members
+/// </summary>
+/// <param name="ptrVecContractStaff"></param>
 void util::OutputContractStaff(std::vector<ContractStaff>* ptrVecContractStaff) {
 	util::for_each_iterator(ptrVecContractStaff->begin(), ptrVecContractStaff->end(), 0, [](int index, ContractStaff& item) {
 		std::cout.precision(2);
@@ -41,6 +54,10 @@ void util::OutputContractStaff(std::vector<ContractStaff>* ptrVecContractStaff) 
 		});
 }
 
+/// <summary>
+/// Outputs table format list of salaried staff members.
+/// </summary>
+/// <param name="ptrVecSalariedStaff"></param>
 void util::OutputSalariedStaff(std::vector<SalariedStaff>* ptrVecSalariedStaff) {
 	util::for_each_iterator(ptrVecSalariedStaff->begin(), ptrVecSalariedStaff->end(), (long)0, [](int index, SalariedStaff& item) {
 		std::cout.precision(2);

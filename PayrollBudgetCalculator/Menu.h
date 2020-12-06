@@ -144,48 +144,72 @@ public:
     void Execute();
 };
 
+/// <summary>
+/// Used to select between adding salaried or contract staff member.
+/// </summary>
 class SubMenuAddStaffMember : public GeneralMenuItem {
 public:
     SubMenuAddStaffMember(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Used to get details for and add salaried staff member
+/// </summary>
 class SubMenuAddSalariedStaff : public GeneralMenuItem {
 public:
     SubMenuAddSalariedStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Used to get details for and add contract staff member
+/// </summary>
 class SubMenuAddContractStaff : public GeneralMenuItem {
 public:
     SubMenuAddContractStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Used to select between removing salaried or contract staff member
+/// </summary>
 class SubMenuRemoveStaffMember : public GeneralMenuItem {
 public:
     SubMenuRemoveStaffMember(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Used to remove salaried staff member
+/// </summary>
 class SubMenuRemoveSalariedStaffMember : public GeneralMenuItem {
 public:
     SubMenuRemoveSalariedStaffMember(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Used to remove contract staff member
+/// </summary>
 class SubMenuRemoveContractStaff : public GeneralMenuItem {
 public:
     SubMenuRemoveContractStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Used to select between updating salaried or contract staff member.
+/// </summary>
 class MenuUpdateStaff : public GeneralMenuItem {
 public:
     MenuUpdateStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Used to list salaried staff members and allow user to select one to update.
+/// </summary>
 class SubMenuUpdateSalariedStaff : public GeneralMenuItem {
 private:
     std::vector<SalariedStaff>* _ptrVecSalariedStaff;
@@ -194,6 +218,9 @@ public:
     void Execute();
 };
 
+/// <summary>
+/// Used to list contract staff members and allow user to select one to update.
+/// </summary>
 class SubMenuUpdateContractStaff : public GeneralMenuItem {
 private:
     std::vector<ContractStaff>* _ptrVecContractStaff;
@@ -202,6 +229,9 @@ public:
     void Execute();
 };
 
+/// <summary>
+/// Base class for menu items which can update salaried or contract staff details.
+/// </summary>
 class ActionMenuStaffBase : public GeneralMenuItem {
 protected:
     Staff* _ptrStaff;
@@ -209,31 +239,45 @@ public:
     ActionMenuStaffBase(std::string output, Staff* staff) : GeneralMenuItem(output, NULL) { _ptrStaff = staff; }
 };
 
-// Below 4 menus use the staff pointer, meaning they can handle updating either Salaried or Contract staff details, for the shared properties/methods these classes have
+/// <summary>
+/// Updates either salaried or contract staff first name.
+/// </summary>
 class ActionMenuUpdateStaffFirstName : public ActionMenuStaffBase {
 public: 
     ActionMenuUpdateStaffFirstName(std::string output, Staff* staff) : ActionMenuStaffBase(output, staff) {}
     void Execute();
 };
 
+/// <summary>
+/// Updates either salaried or contract staff last name.
+/// </summary>
 class ActionMenuUpdateStaffLastName : public ActionMenuStaffBase {
 public:
     ActionMenuUpdateStaffLastName(std::string output, Staff* staff) : ActionMenuStaffBase(output, staff) {}
     void Execute();
 };
 
+/// <summary>
+/// Updates either salaried or contract staff job role
+/// </summary>
 class ActionMenuUpdateStaffJobRole : public ActionMenuStaffBase {
 public:
     ActionMenuUpdateStaffJobRole(std::string output, Staff* staff) : ActionMenuStaffBase(output, staff) {}
     void Execute();
 };
 
+/// <summary>
+/// Updates either salaried or contract staff department
+/// </summary>
 class ActionMenuUpdateStaffDepartment : public ActionMenuStaffBase {
 public:
     ActionMenuUpdateStaffDepartment(std::string output, Staff* staff) : ActionMenuStaffBase(output, staff) {}
     void Execute();
 };
 
+/// <summary>
+/// Base class for menu items which are involved in updating details specific to salaried staff.
+/// </summary>
 class ActionMenuSalariedStaffBase : public GeneralMenuItem {
 protected:
     SalariedStaff* _ptrSalariedStaff;
@@ -241,18 +285,27 @@ public:
     ActionMenuSalariedStaffBase(std::string output, SalariedStaff* salariedStaff) : GeneralMenuItem(output, NULL) { _ptrSalariedStaff = salariedStaff; }
 };
 
+/// <summary>
+/// Used to update salaried staff salary.
+/// </summary>
 class ActionMenuUpdateSalariedSalary : public ActionMenuSalariedStaffBase {
 public:
     ActionMenuUpdateSalariedSalary(std::string output, SalariedStaff* salariedStaff) : ActionMenuSalariedStaffBase(output, salariedStaff) { }
     void Execute();
 };
 
+/// <summary>
+/// Used to update salaried staff status
+/// </summary>
 class ActionMenuUpdateSalariedSeniorStatus : public ActionMenuSalariedStaffBase {
 public:
     ActionMenuUpdateSalariedSeniorStatus(std::string output, SalariedStaff* salariedStaff) : ActionMenuSalariedStaffBase(output, salariedStaff) { }
     void Execute();
 };
 
+/// <summary>
+/// Base class for menu items involved in updating contract staff details.
+/// </summary>
 class ActionMenuContractStaffBase : public GeneralMenuItem {
 protected:
     ContractStaff* _ptrContractStaff;
@@ -260,18 +313,28 @@ public:
     ActionMenuContractStaffBase(std::string output, ContractStaff* contractStaff) : GeneralMenuItem(output, NULL) { _ptrContractStaff = contractStaff; }
 };
 
+/// <summary>
+/// Used to update contract staff wage.
+/// </summary>
 class ActionMenuUpdateContractWage : public ActionMenuContractStaffBase {
 public:
     ActionMenuUpdateContractWage(std::string output, ContractStaff* contractStaff) : ActionMenuContractStaffBase(output, contractStaff) { }
     void Execute();
 };
 
+
+/// <summary>
+/// Used to update contract staff hours.
+/// </summary>
 class ActionMenuUpdateContractHours : public ActionMenuContractStaffBase {
 public:
     ActionMenuUpdateContractHours(std::string output, ContractStaff* contractStaff) : ActionMenuContractStaffBase(output, contractStaff) { }
     void Execute();
 };
 
+/// <summary>
+/// Used to update contract staff number of weeks employeed.
+/// </summary>
 class ActionMenuUpdateContractWeeks : public ActionMenuContractStaffBase {
 public:
     ActionMenuUpdateContractWeeks(std::string output, ContractStaff* contractStaff) : ActionMenuContractStaffBase(output, contractStaff) { }
@@ -337,12 +400,18 @@ public:
     void Execute();
 };
 
+/// <summary>
+/// Saves budget report to text file.
+/// </summary>
 class SubMenuSaveReportText : public MenuSaveLoadBase {
 public:
     SubMenuSaveReportText(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Saves budget report to json file.
+/// </summary>
 class SubMenuSaveReportJson : public MenuSaveLoadBase {
 public:
     SubMenuSaveReportJson(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
