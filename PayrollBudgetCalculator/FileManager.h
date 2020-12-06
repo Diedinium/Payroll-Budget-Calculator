@@ -23,6 +23,7 @@ public:
 
 	BudgetCalculator* GetBudgetCalculatorPtr() { return _ptrBudgetCalculator; }
 	bool CheckIfFileExistsInSaves(std::string fileName);
+	bool CheckIfFileExistsInOutput(std::string fileName);
 	int ClearSavesDirectory();
 };
 #endif // !H_FILEMANAGER

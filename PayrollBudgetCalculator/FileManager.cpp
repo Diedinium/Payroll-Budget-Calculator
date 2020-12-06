@@ -38,6 +38,11 @@ bool FileManager::CheckIfFileExistsInSaves(std::string fileName) {
 	return std::filesystem::exists(pathToTest);
 }
 
+bool FileManager::CheckIfFileExistsInOutput(std::string fileName) {
+	std::filesystem::path pathToTest = _pathOutput / fileName;
+	return std::filesystem::exists(pathToTest);
+}
+
 int FileManager::ClearSavesDirectory() {
 	int iNumRemoved = (int)std::filesystem::remove_all(_pathSaves);
 	this->EnsureDirectoriesExist();

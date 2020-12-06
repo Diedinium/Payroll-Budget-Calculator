@@ -140,7 +140,6 @@ void SubMenuLoadProject::Execute() {
 					ifReadFile >> jsonImport;
 					ifReadFile.close();
 
-					//std::cout << std::setw(4) << jsonImport << std::endl;
 					_ptrStaffManager->Reset();
 
 					if (jsonImport.contains("vecSalariedStaff")) {
@@ -233,69 +232,6 @@ void SubMenuSaveProject::Execute() {
 			util::Pause();
 		}
 	}
-
-	/*SalariedStaff salariedStaffTest = *_ptrStaffManager->GetSalariedStaff("Jake Hall");
-	BudgetCalculator calculator = *_ptrFileManager->GetBudgetCalculatorPtr();
-
-	std::filesystem::path savePath = _ptrFileManager->GetSavesPath() /= L"TestJson.json";
-
-	nlohmann::json j;
-	nlohmann::json jTest = salariedStaffTest;
-	nlohmann::json jTest2 = calculator;
-
-	j.push_back({
-		{"test", 35},
-		{"more", "valueHere"},
-		{"list", {1, 2, 3}}
-		});
-	j.push_back({
-			{"test", 38},
-			{"more", "valueHere2"},
-			{"list", {4, 5, 6}}
-		});
-	j.push_back(jTest);
-
-	nlohmann::json j2;
-
-	j2["testArray1"] = j;
-	j2["testArray2"] = j;
-	j2["testEmptyArray"] = nlohmann::json::array();
-	j2["testCalculator"] = jTest2;
-
-	std::ofstream ofStream(savePath);
-	ofStream << std::setw(4) << j2 << std::endl;
-	ofStream.close();
-
-	std::ifstream ifstream(savePath);
-	nlohmann::json jImport;
-	ifstream >> jImport;
-
-	std::cout << std::setw(4) << jImport << "\n\n";
-
-	std::cout << "testing iterating an array:\n\n";
-
-	for (auto& [key, value] : jImport.items())
-	{
-		std::cout << std::setw(4) << key << " : " << value << "\n";
-	}
-
-	std::cout << "\n\n";
-
-	for (auto& element : jImport["testArray1"])
-	{
-		std::cout << std::setw(4) << element << "\n";
-	}
-
-	std::cout << "\n\nTesting importing again:\n";
-
-	auto test = jImport["testArray1"][2].get<SalariedStaff>();
-	auto test2 = jImport.at("testCalculator").get<BudgetCalculator>();
-
-	std::cout << "Successfully imported: " << test.GetFullName() << "\n";
-
-	std::cout << "Imported calculator: " << test2.GetProjectLength() << "\n";
-
-	util::Pause();*/
 }
 
 void SubMenuClearSaves::Execute() {
@@ -779,7 +715,7 @@ SubMenuViewPayrollBudgetReport::SubMenuViewPayrollBudgetReport(std::string outpu
 void SubMenuViewPayrollBudgetReport::Execute() {
 	MenuContainer objMenuContainer = MenuContainer("Choose action.\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return", &objMenuContainer)));
-	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuSaveLoad("Save this report", _ptrStaffManager, _ptrFileManager)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuSaveReport("Save this report", _ptrStaffManager, _ptrFileManager)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuAddStaffMember("Add staff member", _ptrStaffManager)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuUpdateStaff("Update staff member", _ptrStaffManager)));
 
@@ -904,4 +840,212 @@ void SubMenuUpdateProjectLength::Execute() {
 	_ptrBudgetCalculator->SetProjectLength(dInput);
 	std::cout << "Project length updated to " << _ptrBudgetCalculator->GetProjectLength() << " years\n";
 	util::Pause();
+}
+
+/// <summary>
+/// Displays report saving options
+/// </summary>
+void MenuSaveReport::Execute() {
+	MenuContainer objMenuContainer = MenuContainer("Save report options\nChoose action.\n");
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Cancel", &objMenuContainer)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuSaveReportText("Save report to text file", _ptrStaffManager, _ptrFileManager)));
+	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuSaveReportJson("Save report to json file", _ptrStaffManager, _ptrFileManager)));
+
+	while (!objMenuContainer.GetExitMenu()) {
+		system("cls");
+		objMenuContainer.Execute();
+	}
+}
+
+/// <summary>
+/// Saves current report to text file.
+/// </summary>
+void SubMenuSaveReportText::Execute() {
+	system("cls");
+	std::cout << "Save report to text file.\n";
+	std::cout << "NOTE: Please enter file name for report (max size 50 characters) or press enter to accept default file name. \n";
+	std::cout << "File name: ";
+	std::string fileName = InputValidator::ValidateString(50);
+
+	if (fileName.length() < 1) {
+		fileName = "Report_" + util::GetCurrentDateTimeAsString() + ".txt";
+	}
+	else {
+		fileName = fileName + ".json";
+	}
+
+	if (_ptrFileManager->CheckIfFileExistsInOutput(fileName)) {
+		std::cout << "ERROR: Could not save file as \"" << fileName << "\", this file already exists in the output directory;\n";
+		std::cout << "please try again with a different name, or alternatively, clear the save directory\n";
+		util::Pause();
+	}
+	else {
+		std::filesystem::path pathFileToWrite = _ptrFileManager->GetOutputPath() / fileName;
+
+		try {
+			struct std::tm timeNow = util::GetCurrentDateTimeStruct();
+			std::vector<SalariedStaff>* _ptrSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
+			std::vector<ContractStaff>* _ptrContractStaff = _ptrStaffManager->GetPtrContractStaff();
+			BudgetCalculator* ptrBudgetCalculator = _ptrFileManager->GetBudgetCalculatorPtr();
+			ptrBudgetCalculator->Calculate();
+			std::ofstream ofStream(pathFileToWrite);
+			
+			ofStream.imbue(std::locale("en_GB"));
+			ofStream << "Report date: " << std::put_time(&timeNow, "%c") << "\n\n";
+
+			if (_ptrStaffManager->CountSeniorStaff() > 0) {
+				ofStream << "Number of senior staff assigned to project: " << _ptrStaffManager->CountSeniorStaff() << "\n";
+				ofStream << "Names: ";
+				std::for_each(_ptrSalariedStaff->begin(), _ptrSalariedStaff->end(), [&ofStream](SalariedStaff salariedStaff) {
+					if (salariedStaff.GetSenior()) ofStream << salariedStaff.GetFullName() << ", ";
+					});
+				ofStream << "\n\n";
+			}
+			else {
+				ofStream << "No senior staff added for this project.\n\n";
+			}
+
+			if (_ptrStaffManager->CountStandardStaff() > 0) {
+				ofStream << "Number of salaried staff assigned to project: " << _ptrStaffManager->CountStandardStaff() << "\n";
+				ofStream << "Names: ";
+				std::for_each(_ptrSalariedStaff->begin(), _ptrSalariedStaff->end(), [&ofStream](SalariedStaff salariedStaff) {
+					if (!salariedStaff.GetSenior()) ofStream << salariedStaff.GetFullName() << ", ";
+					});
+				ofStream << "\n\n";
+			}
+			else {
+				ofStream << "No salaried staff added for this project.\n\n";
+			}
+
+			if (_ptrStaffManager->CountContractStaff() > 0) {
+				ofStream << "Number of contract staff assigned to project: " << _ptrStaffManager->CountContractStaff() << "\n";
+				ofStream << "Names: ";
+				std::for_each(_ptrContractStaff->begin(), _ptrContractStaff->end(), [&ofStream](Staff contractStaff) {
+					ofStream << contractStaff.GetFullName() << ", ";
+					});
+				ofStream << "\n\n";
+			}
+			else {
+				ofStream << "No contract staff added for this project.\n\n";
+			}
+
+			ptrBudgetCalculator->Calculate();
+
+			ofStream.precision(2);
+			ofStream << std::fixed << "--- Costs per year ---\n\n";
+			ofStream << "Senior staff total salary: " << ptrBudgetCalculator->GetSeniorSalaryTotal() << "\n";
+			ofStream << "Senior staff average salary: " << ptrBudgetCalculator->GetSeniorSalaryAverage() << "\n\n";
+			ofStream << "Salaried staff total salary: " << ptrBudgetCalculator->GetSalariedSalaryTotal() << "\n";
+			ofStream << "Salaried staff average salary: " << ptrBudgetCalculator->GetSalariedSalaryAverage() << "\n\n";
+			ofStream << "Contractor total costs: " << ptrBudgetCalculator->GetContractorCostTotal() << "\n";
+			ofStream << "Contractor average costs: " << ptrBudgetCalculator->GetContractorCostAverage() << "\n\n";
+			ofStream << "Total payroll cost: " << ptrBudgetCalculator->GetTotalPayroll() << "\n";
+			ofStream << "Total payroll cost (with overrun): (Min - " << ptrBudgetCalculator->GetMinOverPercent() << "%) " << ptrBudgetCalculator->GetMinimumOverBudget() << " - "
+				<< "(Max - " << ptrBudgetCalculator->GetMaxOverPercent() << "%) " << ptrBudgetCalculator->GetMaximumOverBudget() << "\n\n";
+
+			if (!ptrBudgetCalculator->GetProjectIsDefaultDuration()) {
+				ofStream << "--- Costs over tatal project length of " << ptrBudgetCalculator->GetProjectLength() << " years " << "---\n\n";
+				ofStream << "Senior staff total salary: " << ptrBudgetCalculator->GetProjLenSeniorSalaryTotal() << "\n";
+				ofStream << "Salaried staff total salary: " << ptrBudgetCalculator->GetProjLenSalariedSalaryTotal() << "\n";
+				ofStream << "Contractor total costs: " << ptrBudgetCalculator->GetProjLenContractPayTotal() << "\n";
+				ofStream << "Total payroll cost: " << ptrBudgetCalculator->GetProjLenTotalPayroll() << "\n";
+				ofStream << "Total payroll cost (with overrun): (Min - " << ptrBudgetCalculator->GetMinOverPercent() << "%) " << ptrBudgetCalculator->GetProjLenMinimumOverBudget() << " - "
+					<< "(Max - " << ptrBudgetCalculator->GetMaxOverPercent() << "%) " << ptrBudgetCalculator->GetProjLenMaximumOverBudget() << "\n\n";
+			}
+
+			ofStream.close();
+
+			std::cout << "Project exported to file: " << pathFileToWrite << "\n";
+			util::Pause();
+		}
+		catch (std::exception ex) {
+			std::cout << "ERROR: " << ex.what() << "\n";
+			util::Pause();
+		}
+	}
+}
+
+/// <summary>
+/// Serialises current report to json and saves to file.
+/// </summary>
+void SubMenuSaveReportJson::Execute() {
+	system("cls");
+	std::cout << "Save report to json file.\n";
+	std::cout << "NOTE: Please enter file name for report (max size 50 characters) or press enter to accept default file name. \n";
+	std::cout << "File name: ";
+	std::string fileName = InputValidator::ValidateString(50);
+
+	if (fileName.length() < 1) {
+		fileName = "Report_" + util::GetCurrentDateTimeAsString() + ".json";
+	}
+	else {
+		fileName = fileName + ".json";
+	}
+
+	if (_ptrFileManager->CheckIfFileExistsInOutput(fileName)) {
+		std::cout << "ERROR: Could not save file as \"" << fileName << "\", this file already exists in the output directory;\n";
+		std::cout << "please try again with a different name, or alternatively, clear the save directory\n";
+		util::Pause();
+	}
+	else {
+		std::filesystem::path pathFileToWrite = _ptrFileManager->GetOutputPath() / fileName;
+
+		try {
+			BudgetCalculator* ptrBudgetCalculator = _ptrFileManager->GetBudgetCalculatorPtr();
+			ptrBudgetCalculator->Calculate();
+			std::ofstream ofStream(pathFileToWrite);
+			nlohmann::json jsonToSave;
+			nlohmann::json jsonVectorSalariedStaff = nlohmann::json::array();
+			nlohmann::json jsonVectorContractStaff = nlohmann::json::array();
+
+			std::vector<SalariedStaff>* vecPtrSalariedStaff = _ptrStaffManager->GetPtrSalariedStaff();
+			std::vector<ContractStaff>* vecPtrContrctStaff = _ptrStaffManager->GetPtrContractStaff();
+
+			std::for_each(vecPtrSalariedStaff->begin(), vecPtrSalariedStaff->end(), [&jsonVectorSalariedStaff](SalariedStaff salariedStaff) {
+				jsonVectorSalariedStaff.push_back(salariedStaff);
+				});
+
+			std::for_each(vecPtrContrctStaff->begin(), vecPtrContrctStaff->end(), [&jsonVectorContractStaff](ContractStaff contractStaff) {
+				jsonVectorContractStaff.push_back(contractStaff);
+				});
+
+			jsonToSave["vecSalariedStaff"] = jsonVectorSalariedStaff;
+			jsonToSave["vecContractStaff"] = jsonVectorContractStaff;
+			jsonToSave["objBudgetCalculator"] = *_ptrFileManager->GetBudgetCalculatorPtr();
+			jsonToSave["calculatedCosts1year"] = {
+				{"SeniorSalaryTotal", ptrBudgetCalculator->GetSeniorSalaryTotal()},
+				{"SeniorSalaryAverage", ptrBudgetCalculator->GetSeniorSalaryAverage()},
+				{"SalariedSalaryTotal", ptrBudgetCalculator->GetSalariedSalaryTotal()},
+				{"SalariedSalaryAverage", ptrBudgetCalculator->GetSalariedSalaryAverage()},
+				{"ContractPayTotal", ptrBudgetCalculator->GetContractorCostTotal()},
+				{"ContractPayAverage", ptrBudgetCalculator->GetContractorCostAverage()},
+				{"TotalPayroll", ptrBudgetCalculator->GetTotalPayroll()},
+				{"MinimumOverBudget", ptrBudgetCalculator->GetMinimumOverBudget()},
+				{"MaximumOverBudget", ptrBudgetCalculator->GetMaximumOverBudget()}
+			};
+
+			if (!ptrBudgetCalculator->GetProjectIsDefaultDuration()) {
+				std::stringstream ssBuffer;
+				ssBuffer << std::setprecision(2) << "calculatedCosts" << ptrBudgetCalculator->GetProjectLength() << "year";
+				jsonToSave[ssBuffer.str()] = {
+					{"SeniorSalaryTotal", ptrBudgetCalculator->GetProjLenSeniorSalaryTotal()},
+					{"SalariedSalaryTotal", ptrBudgetCalculator->GetProjLenSalariedSalaryTotal()},
+					{"ContractPayTotal", ptrBudgetCalculator->GetProjLenContractPayTotal()},
+					{"TotalPayroll", ptrBudgetCalculator->GetProjLenTotalPayroll()},
+					{"MinimumOverBudget", ptrBudgetCalculator->GetProjLenMinimumOverBudget()},
+					{"MaximumOverBudget", ptrBudgetCalculator->GetProjLenMaximumOverBudget()}
+				};
+			}
+
+			ofStream << std::setw(4) << jsonToSave << std::endl;
+			ofStream.close();
+
+			std::cout << "Project exported to file: " << pathFileToWrite << "\n";
+			util::Pause();
+		}
+		catch (std::exception ex) {
+			std::cout << "ERROR: " << ex.what() << "\n";
+			util::Pause();
+		}
+	}
 }
