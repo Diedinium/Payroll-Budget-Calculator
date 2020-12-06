@@ -58,12 +58,18 @@ public:
     std::string ItemText() const { return _output; }
 };
 
+/// <summary>
+/// Menu item with a menu container - displays staff management options
+/// </summary>
 class MenuStaffManagement : public GeneralMenuItem {
 public:
     MenuStaffManagement(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Special menu option which when executed takes a pointer for the MenuContainer it is within, and executes the SetExitMenu to true. Allows menus to be exited.
+/// </summary>
 class MenuExit : public GeneralMenuItem {
 private:
     MenuContainer* _ptrMenuContainer;
@@ -72,6 +78,9 @@ public:
     void Execute();
 };
 
+/// <summary>
+/// Menu item with menu container - displays budget calculation options.
+/// </summary>
 class MenuCalculateBudget : public GeneralMenuItem {
     BudgetCalculator* _ptrBudgetCalculator;
     FileManager* _ptrFileManager;
@@ -80,6 +89,9 @@ public:
     void Execute();
 };
 
+/// <summary>
+/// Base class for menu items that save and load data, or otherwise interact with files.
+/// </summary>
 class MenuSaveLoadBase : public GeneralMenuItem {
 protected:
     FileManager* _ptrFileManager;
@@ -87,30 +99,45 @@ public:
     MenuSaveLoadBase(std::string output, StaffManager* staffManager, FileManager* fileManager) : GeneralMenuItem(output, staffManager) { _ptrFileManager = fileManager; }
 };
 
+/// <summary>
+/// Menu item with menu container - displays different options for saving/loading files.
+/// </summary>
 class MenuSaveLoad : public MenuSaveLoadBase {
 public:
     MenuSaveLoad(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Allows user to load a project from a file in the saves directory.
+/// </summary>
 class SubMenuLoadProject : public MenuSaveLoadBase {
 public:
     SubMenuLoadProject(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Saves currently loaded staff and budget calculation options to file in the saves directory.
+/// </summary>
 class SubMenuSaveProject : public MenuSaveLoadBase {
 public:
     SubMenuSaveProject(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Clears all saved projects in the save directory.
+/// </summary>
 class SubMenuClearSaves : public MenuSaveLoadBase {
 public:
     SubMenuClearSaves(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
     void Execute();
 };
 
+/// <summary>
+/// Lists all staff currently in project and displays options related to this.
+/// </summary>
 class MenuViewStaff : public GeneralMenuItem {
 public:
     MenuViewStaff(std::string output, StaffManager* staffManager) : GeneralMenuItem(output, staffManager) {};
@@ -298,6 +325,27 @@ public:
 class SubMenuUpdateProjectLength : public MenuCalculateBudgetBase {
 public:
     SubMenuUpdateProjectLength(std::string output, BudgetCalculator* budgetCalculator) : MenuCalculateBudgetBase(output, budgetCalculator) {}
+    void Execute();
+};
+
+/// <summary>
+/// Used in budget calculation menu, displays report saving options to user.
+/// </summary>
+class MenuSaveReport : public MenuSaveLoadBase {
+public:
+    MenuSaveReport(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
+    void Execute();
+};
+
+class SubMenuSaveReportText : public MenuSaveLoadBase {
+public:
+    SubMenuSaveReportText(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
+    void Execute();
+};
+
+class SubMenuSaveReportJson : public MenuSaveLoadBase {
+public:
+    SubMenuSaveReportJson(std::string output, StaffManager* staffManager, FileManager* fileManager) : MenuSaveLoadBase(output, staffManager, fileManager) {};
     void Execute();
 };
 #endif // !MENU_H
