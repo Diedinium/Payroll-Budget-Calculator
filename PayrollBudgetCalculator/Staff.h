@@ -51,13 +51,6 @@ public:
 	/// <param name="strJobRole"></param>
 	/// <param name="strDepartment"></param>
 	void UpdateDetails(std::string strFirstName, std::string strLastName, std::string strJobRole, std::string strDepartment);
-
-	/// <summary>
-	/// Overload that allows just job role and department to be updated.
-	/// </summary>
-	/// <param name="strJobRole"></param>
-	/// <param name="strDepartment"></param>
-	void UpdateDetails(std::string strJobRole, std::string strDepartment);
 };
 
 /// <summary>

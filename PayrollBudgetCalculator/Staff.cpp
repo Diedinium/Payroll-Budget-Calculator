@@ -15,16 +15,6 @@ void Staff::UpdateDetails(std::string strFirstName, std::string strLastName, std
 }
 
 /// <summary>
-/// Overload that allows just job role and department to be updated.
-/// </summary>
-/// <param name="strJobRole"></param>
-/// <param name="strDepartment"></param>
-void Staff::UpdateDetails(std::string strJobRole, std::string strDepartment) {
-	_strJobRole = strJobRole;
-	_strDepartment = strDepartment;
-}
-
-/// <summary>
 /// Staff default constructor, initialises common fields as empty strings.
 /// </summary>
 Staff::Staff() {
