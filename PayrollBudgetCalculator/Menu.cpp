@@ -958,7 +958,7 @@ void SubMenuUpdateProjectLength::Execute() {
 	system("cls");
 	std::cout << "Update project length (in years, e.g. 1 for one year, 1.5 for one year and a half)\n";
 	std::cout << "Enter project length: ";
-	double dInput = InputValidator::ValidateDouble();
+	double dInput = InputValidator::ValidateDoubleMin(0.1);
 	_ptrBudgetCalculator->SetProjectLength(dInput);
 	std::cout << "Project length updated to " << _ptrBudgetCalculator->GetProjectLength() << " years\n";
 	util::Pause();
