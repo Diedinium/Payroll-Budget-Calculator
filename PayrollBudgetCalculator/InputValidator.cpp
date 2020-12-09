@@ -47,6 +47,28 @@ int InputValidator::ValidateInt(int maxSize) {
 	}
 }
 
+int InputValidator::ValidateInt(int minSize, int maxSize) {
+	std::string strInput;
+	int iInput;
+
+	while (true) {
+		std::getline(std::cin, strInput);
+		try {
+			iInput = std::stoi(strInput);
+
+			if (!util::is_between(minSize, maxSize, iInput)) {
+				std::cout << "Input not within valid range (" << minSize << " to " << maxSize << ") : ";
+			}
+			else {
+				return iInput;
+			}
+		}
+		catch (std::exception) {
+			std::cout << "Not a valid number: ";
+		}
+	}
+}
+
 /// <summary>
 /// Static function. Does not allow user to proceed until value that is valid double value (1, 2.52 etc) is entered.
 /// </summary>
@@ -59,7 +81,35 @@ double InputValidator::ValidateDouble() {
 		std::getline(std::cin, strInput);
 		try {
 			dInput = std::stod(strInput);
+
 			return dInput;
+		}
+		catch (std::exception) {
+			std::cout << "Not a valid number: ";
+		}
+	}
+}
+
+/// <summary>
+/// Static function. Does not allow user to proceed until value that is valid double and is more than min value is entered.
+/// </summary>
+/// <param name="minValue"></param>
+/// <returns></returns>
+double InputValidator::ValidateDoubleMin(double minValue) {
+	std::string strInput;
+	double dInput;
+
+	while (true) {
+		std::getline(std::cin, strInput);
+		try {
+			dInput = std::stod(strInput);
+
+			if (util::is_less_than_or_equal_to(dInput, minValue)) {
+				std::cout << "Input cannot be "<< minValue << " or less: ";
+			}
+			else {
+				return dInput;
+			}
 		}
 		catch (std::exception) {
 			std::cout << "Not a valid number: ";

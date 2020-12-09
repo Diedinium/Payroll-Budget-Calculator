@@ -63,6 +63,18 @@ namespace util {
 	}
 
 	/// <summary>
+	/// Returns true/false on if number is less than or equal to compare.
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="number"></param>
+	/// <param name="compare"></param>
+	/// <returns></returns>
+	template <typename T>
+	bool is_less_than_or_equal_to(T number, T compare) {
+		return number <= compare;
+	}
+
+	/// <summary>
 	/// Returns true/false on if number is more than compare.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
@@ -84,7 +96,7 @@ namespace util {
 	/// <returns></returns>
 	template <typename T>
 	bool is_between(T min, T max, T compare) {
-		return compare > min && compare < max;
+		return compare >= min && compare <= max;
 	}
 
 	/// <summary>

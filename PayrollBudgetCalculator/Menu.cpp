@@ -14,12 +14,13 @@ void MenuContainer::Execute()
 		std::cout << "\t" << index << " - " << item->ItemText() << "\n";
 		});
 	std::cout << "\nChoice: ";
-	int iChoice = InputValidator::ValidateInt();
+	int iChoice = InputValidator::ValidateInt(0, (int)_vecMenuItems.size() - 1);
 	if ((int)_vecMenuItems.size() > iChoice && iChoice >= 0) {
 		_vecMenuItems[iChoice]->Execute();
 	}
 	else {
 		std::cout << "Not a valid option, please try again.\n";
+		util::Pause();
 	}
 };
 
@@ -391,9 +392,9 @@ void SubMenuAddSalariedStaff::Execute() {
 	objSalariedStaff.UpdateDetails(strFirstName, strLastName, strJobRole, strDepartment);
 
 	std::cout << "Salary: ";
-	objSalariedStaff.SetSalary(InputValidator::ValidateDouble());
+	objSalariedStaff.SetSalary(InputValidator::ValidateDoubleMin(0.0));
 	std::cout << "Senior (1 for senior, or 0 otherwise): ";
-	iSeniorStatus = InputValidator::ValidateInt();
+	iSeniorStatus = InputValidator::ValidateInt(0, 1);
 
 	if (iSeniorStatus == 1) {
 		objSalariedStaff.SetSenior(true);
@@ -414,7 +415,7 @@ void SubMenuAddSalariedStaff::Execute() {
 /// </summary>
 void SubMenuAddContractStaff::Execute() {
 	system("cls");
-	std::cout << "Add Salaried Staff\n";
+	std::cout << "Add Contract Staff\n";
 
 	std::string strFirstName, strLastName, strJobRole, strDepartment;
 	ContractStaff objContractStaff;
@@ -431,11 +432,11 @@ void SubMenuAddContractStaff::Execute() {
 	objContractStaff.UpdateDetails(strFirstName, strLastName, strJobRole, strDepartment);
 
 	std::cout << "Wage (per hour): ";
-	objContractStaff.SetWage(InputValidator::ValidateDouble());
+	objContractStaff.SetWage(InputValidator::ValidateDoubleMin(0));
 	std::cout << "Weekly hours (max 20h): ";
-	objContractStaff.SetWeeklyHours(InputValidator::ValidateDouble(20));
+	objContractStaff.SetWeeklyHours(InputValidator::ValidateDouble(0.1, 20));
 	std::cout << "Contracted Weeks (max 30 weeks): ";
-	objContractStaff.SetWeeks(InputValidator::ValidateInt(30));
+	objContractStaff.SetWeeks(InputValidator::ValidateInt(1, 30));
 
 	try {
 		_ptrStaffManager->AddContractStaff(objContractStaff);
@@ -452,7 +453,7 @@ void SubMenuAddContractStaff::Execute() {
 /// Choice menu, allows user to choose between removing salaried or contracted staff member
 /// </summary>
 void SubMenuRemoveStaffMember::Execute() {
-	MenuContainer objMenuContainer = MenuContainer("Choose Staff type to add.\n");
+	MenuContainer objMenuContainer = MenuContainer("Choose Staff type to remove.\n");
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Return to previous", &objMenuContainer)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuRemoveSalariedStaffMember("Remove salaried staff member (including senior)", _ptrStaffManager)));
 	objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new SubMenuRemoveContractStaff("Remove contract staff member", _ptrStaffManager)));
@@ -590,18 +591,6 @@ void SubMenuUpdateSalariedStaff::Execute() {
 
 		SalariedStaff* ptrObjSalariedStaff = _ptrStaffManager->GetSalariedStaff(strFullName);
 
-		while (ptrObjSalariedStaff == NULL) {
-			std::cout << "No staff member with this name found, please try again (enter 0 to cancel).\n";
-			std::cout << "Full name: ";
-			strFullName = InputValidator::ValidateString();
-			if (strFullName == "0") {
-				boolExitWhile = true;
-				ptrObjSalariedStaff = new SalariedStaff();
-				continue;
-			}
-			ptrObjSalariedStaff = _ptrStaffManager->GetSalariedStaff(strFullName);
-		}
-
 		MenuContainer objMenuContainer = MenuContainer("Choose action.\n");
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Cancel", &objMenuContainer)));
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffFirstName("Update first name", ptrObjSalariedStaff)));
@@ -610,6 +599,19 @@ void SubMenuUpdateSalariedStaff::Execute() {
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffDepartment("Update Department", ptrObjSalariedStaff)));
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateSalariedSalary("Update Salary", ptrObjSalariedStaff)));
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateSalariedSeniorStatus("Update Senior status", ptrObjSalariedStaff)));
+
+		while (ptrObjSalariedStaff == NULL) {
+			std::cout << "No staff member with this name found, please try again (enter 0 to cancel).\n";
+			std::cout << "Full name: ";
+			strFullName = InputValidator::ValidateString();
+			if (strFullName == "0") {
+				boolExitWhile = true;
+				ptrObjSalariedStaff = new SalariedStaff();
+				objMenuContainer.SetExitMenu(true);
+				continue;
+			}
+			ptrObjSalariedStaff = _ptrStaffManager->GetSalariedStaff(strFullName);
+		}
 
 		while (!objMenuContainer.GetExitMenu()) {
 			system("cls");
@@ -650,18 +652,6 @@ void SubMenuUpdateContractStaff::Execute() {
 
 		ContractStaff* ptrObjContractStaff = _ptrStaffManager->GetContractStaff(strFullName);
 
-		while (ptrObjContractStaff == NULL) {
-			std::cout << "No staff member with this name found, please try again (enter 0 to cancel).\n";
-			std::cout << "Full name: ";
-			strFullName = InputValidator::ValidateString();
-			if (strFullName == "0") {
-				boolExitWhile = true;
-				ptrObjContractStaff = new ContractStaff();
-				continue;
-			}
-			ptrObjContractStaff = _ptrStaffManager->GetContractStaff(strFullName);
-		}
-
 		MenuContainer objMenuContainer = MenuContainer("Choose action.\n");
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Cancel", &objMenuContainer)));
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateStaffFirstName("Update first name", ptrObjContractStaff)));
@@ -671,6 +661,19 @@ void SubMenuUpdateContractStaff::Execute() {
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateContractWage("Update Wage", ptrObjContractStaff)));
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateContractHours("Update contracted hours", ptrObjContractStaff)));
 		objMenuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new ActionMenuUpdateContractWeeks("Update contracted weeks", ptrObjContractStaff)));
+
+		while (ptrObjContractStaff == NULL) {
+			std::cout << "No staff member with this name found, please try again (enter 0 to cancel).\n";
+			std::cout << "Full name: ";
+			strFullName = InputValidator::ValidateString();
+			if (strFullName == "0") {
+				boolExitWhile = true;
+				ptrObjContractStaff = new ContractStaff();
+				objMenuContainer.SetExitMenu(true);
+				continue;
+			}
+			ptrObjContractStaff = _ptrStaffManager->GetContractStaff(strFullName);
+		}
 
 		while (!objMenuContainer.GetExitMenu()) {
 			system("cls");
@@ -733,9 +736,9 @@ void ActionMenuUpdateStaffDepartment::Execute() {
 /// </summary>
 void ActionMenuUpdateSalariedSalary::Execute() {
 	std::cout << "\nEnter new salary: ";
-	double dSalary = InputValidator::ValidateDouble();
+	double dSalary = InputValidator::ValidateDoubleMin(0);
 
-	_ptrSalariedStaff->SetSalary(dSalary);
+	_ptrSalariedStaff->SetSalary(dSalary); 
 	std::cout << "Salary updated\n";
 	util::Pause();
 }
@@ -775,7 +778,7 @@ void ActionMenuUpdateSalariedSeniorStatus::Execute() {
 /// </summary>
 void ActionMenuUpdateContractWage::Execute() {
 	std::cout << "\nEnter new wage: ";
-	double dWage = InputValidator::ValidateDouble();
+	double dWage = InputValidator::ValidateDoubleMin(0);
 
 	_ptrContractStaff->SetWage(dWage);
 	std::cout << "Wage updated\n";
@@ -787,7 +790,7 @@ void ActionMenuUpdateContractWage::Execute() {
 /// </summary>
 void ActionMenuUpdateContractHours::Execute() {
 	std::cout << "\nEnter new weekly hours (max 20): ";
-	double dWeeklyHours = InputValidator::ValidateDouble(20);
+	double dWeeklyHours = InputValidator::ValidateDouble(0.1, 20);
 
 	_ptrContractStaff->SetWeeklyHours(dWeeklyHours);
 	std::cout << "Weekly hours updated\n";
@@ -799,7 +802,7 @@ void ActionMenuUpdateContractHours::Execute() {
 /// </summary>
 void ActionMenuUpdateContractWeeks::Execute() {
 	std::cout << "\nEnter new contracted weeks (max 30): ";
-	int dContractedWeeks = InputValidator::ValidateInt(30);
+	int dContractedWeeks = InputValidator::ValidateInt(1, 30);
 
 	_ptrContractStaff->SetWeeks(dContractedWeeks);
 	std::cout << "Contracted weeks updated\n";

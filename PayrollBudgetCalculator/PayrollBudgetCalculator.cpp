@@ -17,7 +17,7 @@ int main()
     // NOTE TO TESTERS: Uncomment this code to quickly add an collection of staff if you don't want to waste lots of time adding staff members.
     // Any references to famous characters are completely coincidental ;)
 
-    /*staffManager.AddContractStaff(ContractStaff("Obi-wan", "Kenobi", "Jedi Master", "Jedi Order", 28.50, 5, 29));
+    staffManager.AddContractStaff(ContractStaff("Obi-wan", "Kenobi", "Jedi Master", "Jedi Order", 28.50, 5, 29));
     staffManager.AddContractStaff(ContractStaff("Anakin", "Skywalker", "Jedi Knight", "Jedi Order", 10.50, 10, 22));
     staffManager.AddContractStaff(ContractStaff("Ben", "Kenobi", "Jedi Master", "Jedi Order", 23, 17, 5));
     staffManager.AddContractStaff(ContractStaff("Jango", "Fett", "Bounty Hunter", "Himself", 18.25, 17, 15));
@@ -31,7 +31,7 @@ int main()
 
     staffManager.AddSalariedStaff(SalariedStaff("Jabba", "The Hut", "Crime lord", "Hutt gang", 89224.42, true));
     staffManager.AddSalariedStaff(SalariedStaff("Luke", "Skywalker", "Jedi Knight", "Jedi Order", 80824.24, true));
-    staffManager.AddSalariedStaff(SalariedStaff("Leia", "Organa", "Princess", "Rebel Alliance", 252452, true));*/
+    staffManager.AddSalariedStaff(SalariedStaff("Leia", "Organa", "Princess", "Rebel Alliance", 252452, true));
 
     MenuContainer menuContainer = MenuContainer("Welcome to the payroll project budget calculator.\nPlease choose your option below.\n");
     menuContainer.AddMenuItem(std::unique_ptr<MenuItem>(new MenuExit("Exit application", &menuContainer)));

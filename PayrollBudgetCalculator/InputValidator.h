@@ -29,10 +29,25 @@ public:
 	static int ValidateInt(int maxSize);
 
 	/// <summary>
+	/// Static function, does not allow user to proceed until value is entered that is equal to or between the min/max sizes.
+	/// </summary>
+	/// <param name="minSize"></param>
+	/// <param name="maxSize"></param>
+	/// <returns>int</returns>
+	static int ValidateInt(int minSize, int maxSize);
+
+	/// <summary>
 	/// Static function. Does not allow user to proceed until value that is valid double value (1, 2.52 etc) is entered.
 	/// </summary>
 	/// <returns>double</returns>
 	static double ValidateDouble();
+
+	/// <summary>
+	/// Static function. Does not allow user to proceed until value that is more than minValue is entered.
+	/// </summary>
+	/// <param name="minValue"></param>
+	/// <returns>double</returns>
+	static double ValidateDoubleMin(double minValue);
 
 	/// <summary>
 	/// Static function. Does not allow user to proceed until a value that is a valid double value (1, 52.52 etc) is entered, and it is below the max size.
